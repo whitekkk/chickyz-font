@@ -1,0 +1,484 @@
+<template>
+  <div>
+    <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
+    <game :wait="wait" :mousePosition="mousePosition" :move="move" :time="time" :outOfArea="outOfArea" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods"></game>
+  </div>
+</template>
+
+<script>
+import Game from './components/Game'
+import PopUp from './components/PopUp'
+import firebase from 'firebase'
+var config = {
+  apiKey: 'AIzaSyDI7TmN6g-aS8rIvzdWPu0KTtFe0_HW0A4',
+  authDomain: 'todos-4ded8.firebaseapp.com',
+  databaseURL: 'https://todos-4ded8.firebaseio.com',
+  storageBucket: 'todos-4ded8.appspot.com',
+  messagingSenderId: '245537528887'
+}
+firebase.initializeApp(config)
+
+var Avatars = firebase.database().ref('avatars')
+var myId = ''
+window.onbeforeunload = function () {
+  firebase.database().ref('avatars/' + myId).remove()
+}
+
+var Foods = firebase.database().ref('foods')
+
+export default {
+  created () {
+    window.addEventListener('keyup', this.upKey)
+    window.addEventListener('keydown', this.downKey)
+  },
+  mounted () {
+    let vm = this
+    var roomCheck = 0
+    var key = 'value'
+    Avatars.on(key, function (snapshot) {
+      roomCheck = snapshot.numChildren()
+      if (roomCheck >= 30) {
+        vm.checkFull = true
+      }
+    })
+    key = 'child_moved'
+    let x = Math.floor(Math.random() * 2750) + 50
+    let y = Math.floor(Math.random() * 2788) + 50
+    let avatar = {
+      x,
+      y
+    }
+    let result = Avatars.push(avatar)
+    myId = result.key
+    // *warning
+    Avatars.on('child_added', function (snapshot) {
+      var item = snapshot.val()
+      item.id = snapshot.key
+      vm.avatars.push(item)
+    })
+    Avatars.on('child_changed', function (snapshot) {
+      var id = snapshot.key
+      var avatar = vm.avatars.find(avatar => avatar.id === id)
+      avatar.x = snapshot.val().x
+      avatar.y = snapshot.val().y
+      avatar.color = snapshot.val().color
+      avatar.face = snapshot.val().face
+      avatar.speed = snapshot.val().speed
+      avatar.eat = snapshot.val().eat
+      avatar.score = snapshot.val().score
+      // change
+      if (vm.myAvatar.id === id) {
+        vm.myAvatar.x = snapshot.val().x
+        vm.myAvatar.y = snapshot.val().y
+        vm.myAvatar.color = snapshot.val().color
+        vm.myAvatar.face = snapshot.val().face
+        vm.myAvatar.speed = snapshot.val().speed
+        vm.myAvatar.eat = snapshot.val().eat
+        vm.myAvatar.score = snapshot.val().score
+        if (vm.myAvatar.score === undefined) {
+          vm.myAvatar.id = ''
+        }
+      }
+    })
+    Avatars.on('child_removed', function (snapshot) {
+      var id = snapshot.key
+      vm.avatars.splice(vm.avatars.findIndex(avatar => avatar.id === id), 1)
+      // vm.checkName = true ***`แก้ซะ`
+      var checkDie = vm.avatars.find(avatar => avatar.id === myId)
+      if (checkDie === undefined) {
+        // vm.checkName = true // *****************
+        vm.checkName = true
+        vm.wait = true
+        vm.waitingTime = 3
+        clearInterval(vm.active)
+      }
+    })
+    vm.foodsGen()
+    Foods.on('child_added', function (snapshot) {
+      var item = snapshot.val()
+      item.id = snapshot.key
+      vm.foods.push(item)
+    })
+    Foods.on('child_removed', function (snapshot) {
+      var id = snapshot.key
+      vm.foods.splice(vm.foods.findIndex(food => food.id === id), 1)
+    })
+  },
+  data () {
+    let winHeight = window.innerHeight
+    let winWidth = window.innerWidth
+    let c = Math.floor(Math.random() * 3) + 1
+    let f = Math.floor(Math.random() * 3) + 1
+    let color = ''
+    if (c === 1) {
+      color = '#F5FF5D'
+    } else if (c === 2) {
+      color = '#AEFBE9'
+    } else {
+      color = '#FC665A'
+    }
+
+    return {
+      target: '',
+      checkFull: false,
+      winHeight,
+      winWidth,
+      halfHeight: winHeight / 2,
+      halfWidth: winWidth / 2,
+      mouseX: 0,
+      mouseY: 0,
+      avatars: [],
+      foods: [],
+      time: 20,
+      checkName: true,
+      active: false,
+      waitingTime: 3,
+      wait: true,
+      color,
+      face: '',
+      f,
+      c,
+      myAvatar: {
+        name: '',
+        // color: `${chickColor}`, // color: `rgb(${r}, ${g}, ${b})`,
+        x: 0,
+        y: 0,
+        face: '',
+        color,
+        speed: false,
+        eat: false,
+        king: false,
+        score: 0
+      }
+    }
+  },
+
+  components: {
+    Game,
+    PopUp
+  },
+
+  // methods
+  methods: {
+    selectFace (num) {
+      this.f = this.f + num
+      if (this.f > 3) {
+        this.f = 1
+      } else if (this.f <= 0) {
+        this.f = 3
+      }
+    },
+    selectColor (num) {
+      this.c = this.c + num
+      if (this.c > 3) {
+        this.c = 1
+      } else if (this.c <= 0) {
+        this.c = 3
+      }
+      if (this.c === 1) {
+        this.color = '#F5FF5D'
+      } else if (this.c === 2) {
+        this.color = '#AEFBE9'
+      } else {
+        this.color = '#FC665A'
+      }
+    },
+    gameStart () {
+      let vm = this
+      setInterval(function () {
+        vm.winHeight = window.innerHeight
+        vm.winWidth = window.innerWidth
+        vm.halfHeight = vm.winHeight / 2
+        vm.halfWidth = vm.winWidth / 2
+        vm.avatars.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
+      }, 300)
+      // *** ranks
+      firebase.database().ref('avatars/' + myId).remove()
+      vm.addAvatar(vm.myAvatar)
+    },
+    letPlay () {
+      let vm = this
+      vm.checkName = false
+      let i = 0
+      let waiting = setInterval(function () {
+        vm.waitingTime--
+        if (i === 2) {
+          vm.gameStart()
+          vm.wait = false
+          clearInterval(waiting)
+        }
+        i++
+      }, 1000)
+    },
+    upKey (e) {
+      if (e.key === 'z') {
+        this.normalSpeed()
+      }
+      if (e.key === 'x') {
+        this.shutup()
+      }
+    },
+    downKey (e) {
+      if (e.keyCode === 17) {
+      }
+      if (e.key === 'z') {
+        this.upSpeed()
+      }
+      if (e.key === 'x') {
+        this.eat()
+      }
+    },
+    addAvatar (newAvatar) {
+      let vm = this
+      let color = vm.color
+      let face = vm.f
+      vm.myAvatar.x = Math.floor(Math.random() * 2750) + 50
+      vm.myAvatar.y = Math.floor(Math.random() * 2788) + 50
+      vm.myAvatar.face = face
+      vm.myAvatar.color = color
+      vm.myAvatar.speed = false
+      vm.myAvatar.eat = false
+      vm.myAvatar.king = false
+      vm.myAvatar.score = 0
+      let result = Avatars.push(newAvatar)
+      this.myAvatar.id = result.key
+      myId = this.myAvatar.id
+      if (vm.myAvatar.color === '#F5FF5D') {
+        vm.target = '#AEFBE9'
+      } else if (vm.myAvatar.color === '#AEFBE9') {
+        vm.target = '#FC665A'
+      } else {
+        vm.target = '#F5FF5D'
+      }
+    },
+    move (time) {
+      let vm = this
+      let xCenter = vm.winWidth / 2
+      let yCenter = vm.winHeight / 2
+      var xOrigin = vm.myAvatar.x
+      var yOrigin = vm.myAvatar.y
+      var x1 = vm.mouseX
+      var y1 = vm.mouseY
+      var dx = 0
+      var dy = 0
+      var checkX = 1
+      var checkY = 1
+      var err = 0
+      let i = 1
+      var e2 = 0
+      clearInterval(vm.active)
+      vm.active = setInterval(function () {
+        if (i === 10) {
+          x1 = vm.mouseX
+          y1 = vm.mouseY
+          dx = Math.abs(x1 - xCenter)
+          dy = Math.abs(y1 - yCenter)
+          checkX = (xCenter < x1) ? 5 : -5
+          checkY = (yCenter < y1) ? 5 : -5
+          err = dx - dy
+          e2 = 2 * err
+          i = 0
+        }
+        i++
+        if (vm.myAvatar.id !== myId) {
+          vm.wait = true
+        }
+        if (!(((xCenter + 25 > x1) && (xCenter - 25 < x1)) && ((yCenter - 25 < y1) && (yCenter + 25 > y1)))) {
+          if (vm.active && vm.myAvatar.id !== '') {
+            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+              y: yOrigin,
+              x: xOrigin
+            })
+          }
+
+          if (e2 > -dy) {
+            err -= dy
+            xOrigin += checkX
+          }
+          if (e2 < dx) {
+            err += dx
+            yOrigin += checkY
+          }
+          // check out of area
+          if (yOrigin < -20 && y1 < yCenter) {
+            yOrigin = -20
+          }
+          if (xOrigin < 0 && x1 < xCenter) {
+            xOrigin = 0
+          }
+          if (yOrigin > 2845 && y1 > yCenter) {
+            yOrigin = 2845
+          }
+          if (xOrigin > 2898 && x1 > xCenter) {
+            xOrigin = 2898
+          }
+        }
+      }, time)
+    },
+    checkEat () {
+      var vm = this
+      var index = 0
+      var check = 0
+      // *chekeat food
+      var eatFood = 0
+      eatFood = vm.foods.find(food => {
+        index++
+        check = ((food.x < vm.myAvatar.x + 50) && (food.x > vm.myAvatar.x - 50)) && ((food.y < vm.myAvatar.y + 50) && (food.y > vm.myAvatar.y - 50))
+        return (check)
+      })
+      vm.foods.splice(index, 1)
+      if (eatFood !== undefined) {
+        firebase.database().ref('foods/' + eatFood.id).remove()
+        if (vm.myAvatar.score < 10) {
+          vm.myAvatar.score = -1
+        }
+        vm.myAvatar.score /= 2
+        vm.myAvatar.color = eatFood.color
+
+        if (vm.myAvatar.color === '#F5FF5D') {
+          vm.target = '#AEFBE9'
+        } else if (vm.myAvatar.color === '#AEFBE9') {
+          vm.target = '#FC665A'
+        } else {
+          vm.target = '#F5FF5D'
+        }
+        firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+          color: vm.myAvatar.color,
+          score: vm.myAvatar.score
+        })
+      }
+      // *chekeat chick
+      var eatChick = 0
+      index = 0
+      check = 0
+      eatChick = vm.avatars.find(avatar => {
+        index++
+        check = ((((avatar.x < vm.myAvatar.x + 25) && (avatar.x > vm.myAvatar.x - 25)) && ((avatar.y < vm.myAvatar.y + 25) && (avatar.y > vm.myAvatar.y - 25))) && avatar.id !== vm.myAvatar.id)
+        return (check)
+      })
+      if (eatChick !== undefined) {
+        if (vm.myAvatar.color === '#F5FF5D') {
+          if (eatChick.color === '#AEFBE9') {
+            firebase.database().ref('avatars/' + eatChick.id).remove()
+            vm.myAvatar.score += (eatChick.score / 2) + 10
+            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+              score: vm.myAvatar.score
+            })
+          }
+        } else if (vm.myAvatar.color === '#AEFBE9') {
+          if (eatChick.color === '#FC665A') {
+            firebase.database().ref('avatars/' + eatChick.id).remove()
+            vm.myAvatar.score += (eatChick.score / 2) + 10
+            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+              score: vm.myAvatar.score
+            })
+          }
+        } else {
+          if (eatChick.color === '#F5FF5D') {
+            firebase.database().ref('avatars/' + eatChick.id).remove()
+            vm.myAvatar.score += (eatChick.score / 2) + 10
+            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+              score: vm.myAvatar.score
+            })
+          }
+        }
+      }
+      if (vm.myAvatar.score < 0) {
+        clearInterval(vm.active)
+        firebase.database().ref('avatars/' + myId).remove()
+      }
+    },
+    outOfArea () {
+      let vm = this
+      clearInterval(vm.active)
+    },
+    mousePosition () {
+      let vm = this
+      let position = window.event
+      vm.mouseX = position.clientX
+      vm.mouseY = position.clientY
+      let face = vm.myAvatar.color.toString()
+      vm.actionChick(vm, face)
+    },
+    actionChick (vm, face) {
+      if (vm.myAvatar.eat && vm.myAvatar.face !== vm.f + '-0') {
+        firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+          face: vm.myAvatar.face + '-0'
+        })
+      }
+    },
+    upSpeed () {
+      if (!this.myAvatar.speed) {
+        this.time = 10
+        clearInterval(this.active)
+        this.move(this.time)
+        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+          speed: true
+        })
+      }
+    },
+    normalSpeed () {
+      this.time = 20
+      clearInterval(this.active)
+      this.move(this.time)
+      firebase.database().ref('avatars/' + this.myAvatar.id).update({
+        speed: false
+      })
+    },
+    eat () {
+      this.myAvatar.face = this.myAvatar.face.toString()
+      if (this.myAvatar.face.search('-0') === -1 && !this.myAvatar.eat) {
+        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+          eat: true
+        })
+      }
+      this.checkEat()
+    },
+    shutup () {
+      firebase.database().ref('avatars/' + this.myAvatar.id).update({
+        face: this.myAvatar.face.replace('-0', ''),
+        eat: false
+      })
+    },
+    foodsGen () {
+      var newfood
+      var vm = this
+      var length = 0
+      var genfood = Math.floor(Math.random() * 3) + 1
+      var color = ''
+      if (genfood === 1) {
+        color = '#F5FF5D'
+      } else if (genfood === 2) {
+        color = '#AEFBE9'
+      } else {
+        color = '#FC665A'
+      }
+      newfood = {
+        pic: genfood,
+        color,
+        x: Math.floor(Math.random() * 2800) + 50,
+        y: Math.floor(Math.random() * 2778) + 50
+      }
+      vm.addfood(newfood)
+      setInterval(function () {
+        if (length < 10) {
+          newfood = {
+            pic: genfood,
+            color: Math.floor(Math.random() * 3) + 1,
+            x: Math.floor(Math.random() * 2800) + 50,
+            y: Math.floor(Math.random() * 2778) + 50
+          }
+          vm.addfood(newfood)
+          length = vm.foods.length
+        }
+      }, 1000 * 60 * 5)
+    },
+    addfood (newfood) {
+      Foods.push(newfood)
+    }
+  }
+}
+</script>
+<style
+
+src="../static/css/game.css"> </style>
