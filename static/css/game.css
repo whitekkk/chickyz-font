@@ -135,3 +135,9 @@ div.logo {
   margin-left: -250px;
   padding: 60px 0;
 }
+a.name {
+  font-family: Lucida Console;
+  font-weight: bolder; color: #FFFFFF;
+  font-size: 1.5em;
+  text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+}

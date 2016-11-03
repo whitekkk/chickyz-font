@@ -7,7 +7,7 @@
       <input-name :myAvatar="myAvatar" :letPlay="letPlay"></input-name>
       <sample-picture :color="color" :f="f"></sample-picture>
       <select-chick-menu :selectFace="selectFace" :f="f" :selectColor="selectColor" :c="c"></select-chick-menu>
-      <explan-game> </explan-game>
+      <explan-game></explan-game>
     </div>
   </div>
 </template>

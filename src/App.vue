@@ -2,10 +2,20 @@
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
     <game :wait="wait" :mousePosition="mousePosition" :move="move" :time="time" :outOfArea="outOfArea" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods"></game>
+    <div id="fb-root"></div>
   </div>
 </template>
 
 <script>
+(function (d, s, id) {
+  var js = d.getElementsByTagName(s)[0]
+  var fjs = d.getElementsByTagName(s)[0]
+  if (d.getElementById(id)) return
+  js = d.createElement(s); js.id = id
+  js.src = '//connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v2.8'
+  fjs.parentNode.insertBefore(js, fjs)
+}(document, 'script', 'facebook-jssdk'))
+
 import Game from './components/Game'
 import PopUp from './components/PopUp'
 import firebase from 'firebase'
@@ -37,7 +47,7 @@ export default {
     var key = 'value'
     Avatars.on(key, function (snapshot) {
       roomCheck = snapshot.numChildren()
-      if (roomCheck >= 30) {
+      if (roomCheck >= 40) {
         vm.checkFull = true
       }
     })
