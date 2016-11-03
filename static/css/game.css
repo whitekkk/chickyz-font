@@ -33,7 +33,7 @@ div.popUpName {
   position: fixed;
   z-index: 9999;
   background-color: white;
-  top: 50%;
+  top: 40%;
   left: 50%;
   width: 400px;
   height: 150px;
@@ -129,11 +129,12 @@ div.target {
 div.logo {
   position: fixed;
   z-index: 9999;
-  top: 20%;
+  top: 0%;
   left: 50%;
   margin-top: -100px;
   margin-left: -250px;
   padding: 60px 0;
+  width: 100%
 }
 a.name {
   font-family: Lucida Console;

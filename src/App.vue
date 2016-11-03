@@ -1,7 +1,7 @@
 <template>
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :move="move" :time="time" :outOfArea="outOfArea" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :move="move" :time="time" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -47,7 +47,7 @@ export default {
     var key = 'value'
     Avatars.on(key, function (snapshot) {
       roomCheck = snapshot.numChildren()
-      if (roomCheck >= 40) {
+      if (roomCheck >= 35) {
         vm.checkFull = true
       }
     })
@@ -60,6 +60,7 @@ export default {
     }
     let result = Avatars.push(avatar)
     myId = result.key
+    firebase.database().ref('avatars/' + myId).remove()
     // *warning
     Avatars.on('child_added', function (snapshot) {
       var item = snapshot.val()
@@ -87,6 +88,9 @@ export default {
         vm.myAvatar.score = snapshot.val().score
         if (vm.myAvatar.score === undefined) {
           vm.myAvatar.id = ''
+          vm.wait = true
+          vm.waitingTime = 3
+          vm.checkName = true
         }
       }
     })
@@ -94,14 +98,6 @@ export default {
       var id = snapshot.key
       vm.avatars.splice(vm.avatars.findIndex(avatar => avatar.id === id), 1)
       // vm.checkName = true ***`แก้ซะ`
-      var checkDie = vm.avatars.find(avatar => avatar.id === myId)
-      if (checkDie === undefined) {
-        // vm.checkName = true // *****************
-        vm.checkName = true
-        vm.wait = true
-        vm.waitingTime = 3
-        clearInterval(vm.active)
-      }
     })
     vm.foodsGen()
     Foods.on('child_added', function (snapshot) {
@@ -208,17 +204,24 @@ export default {
     },
     letPlay () {
       let vm = this
-      vm.checkName = false
-      let i = 0
-      let waiting = setInterval(function () {
-        vm.waitingTime--
-        if (i === 2) {
-          vm.gameStart()
-          vm.wait = false
-          clearInterval(waiting)
-        }
-        i++
-      }, 1000)
+      if (typeof window.orientation === 'undefined') {
+        vm.checkName = false
+        let i = 0
+        let waiting = setInterval(function () {
+          vm.waitingTime--
+          if (i === 2) {
+            vm.gameStart()
+            vm.wait = false
+            clearInterval(waiting)
+          }
+          i++
+        }, 1000)
+      } else {
+        vm.wait = true
+        vm.waitingTime = 3
+        vm.checkName = true
+        window.alert('Sorry, this game not support in mobile device.')
+      }
     },
     upKey (e) {
       if (e.key === 'z') {
@@ -290,9 +293,6 @@ export default {
           i = 0
         }
         i++
-        if (vm.myAvatar.id !== myId) {
-          vm.wait = true
-        }
         if (!(((xCenter + 25 > x1) && (xCenter - 25 < x1)) && ((yCenter - 25 < y1) && (yCenter + 25 > y1)))) {
           if (vm.active && vm.myAvatar.id !== '') {
             firebase.database().ref('avatars/' + vm.myAvatar.id).update({
@@ -390,6 +390,12 @@ export default {
             firebase.database().ref('avatars/' + vm.myAvatar.id).update({
               score: vm.myAvatar.score
             })
+          } else {
+            firebase.database().ref('avatars/' + eatChick.id).remove()
+            vm.myAvatar.score += 5
+            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+              score: vm.myAvatar.score
+            })
           }
         }
       }
@@ -398,57 +404,65 @@ export default {
         firebase.database().ref('avatars/' + myId).remove()
       }
     },
-    outOfArea () {
-      let vm = this
-      clearInterval(vm.active)
-    },
     mousePosition () {
       let vm = this
-      let position = window.event
-      vm.mouseX = position.clientX
-      vm.mouseY = position.clientY
-      let face = vm.myAvatar.color.toString()
-      vm.actionChick(vm, face)
+      if (this.waitingTime === 0) {
+        let position = window.event
+        vm.mouseX = position.clientX
+        vm.mouseY = position.clientY
+        let face = vm.myAvatar.color.toString()
+        vm.actionChick(vm, face)
+      }
     },
     actionChick (vm, face) {
-      if (vm.myAvatar.eat && vm.myAvatar.face !== vm.f + '-0') {
-        firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-          face: vm.myAvatar.face + '-0'
-        })
+      if (this.wait !== true) {
+        if (vm.myAvatar.eat && vm.myAvatar.face !== vm.f + '-0') {
+          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+            face: vm.myAvatar.face + '-0'
+          })
+        }
       }
     },
     upSpeed () {
       if (!this.myAvatar.speed) {
         this.time = 10
         clearInterval(this.active)
-        this.move(this.time)
-        firebase.database().ref('avatars/' + this.myAvatar.id).update({
-          speed: true
-        })
+        if (this.waitingTime === 0) {
+          this.move(this.time)
+          firebase.database().ref('avatars/' + this.myAvatar.id).update({
+            speed: true
+          })
+        }
       }
     },
     normalSpeed () {
       this.time = 20
       clearInterval(this.active)
-      this.move(this.time)
-      firebase.database().ref('avatars/' + this.myAvatar.id).update({
-        speed: false
-      })
-    },
-    eat () {
-      this.myAvatar.face = this.myAvatar.face.toString()
-      if (this.myAvatar.face.search('-0') === -1 && !this.myAvatar.eat) {
+      if (this.waitingTime === 0) {
+        this.move(this.time)
         firebase.database().ref('avatars/' + this.myAvatar.id).update({
-          eat: true
+          speed: false
         })
       }
-      this.checkEat()
+    },
+    eat () {
+      if (this.waitingTime === 0) {
+        this.myAvatar.face = this.myAvatar.face.toString()
+        if (this.myAvatar.face.search('-0') === -1 && !this.myAvatar.eat) {
+          firebase.database().ref('avatars/' + this.myAvatar.id).update({
+            eat: true
+          })
+        }
+        this.checkEat()
+      }
     },
     shutup () {
-      firebase.database().ref('avatars/' + this.myAvatar.id).update({
-        face: this.myAvatar.face.replace('-0', ''),
-        eat: false
-      })
+      if (this.waitingTime === 0) {
+        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+          face: this.myAvatar.face.replace('-0', ''),
+          eat: false
+        })
+      }
     },
     foodsGen () {
       var newfood
@@ -481,7 +495,7 @@ export default {
           vm.addfood(newfood)
           length = vm.foods.length
         }
-      }, 1000 * 60 * 5)
+      }, 1000 * 60 * 10)
     },
     addfood (newfood) {
       Foods.push(newfood)
