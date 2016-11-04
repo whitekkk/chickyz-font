@@ -447,7 +447,7 @@ export default {
     normalSpeed () {
       this.time = 20
       clearInterval(this.active)
-      if (this.waitingTime === 0) {
+      if (this.checkName === false) {
         this.move(this.time)
         firebase.database().ref('avatars/' + this.myAvatar.id).update({
           speed: false

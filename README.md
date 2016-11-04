@@ -1,4 +1,4 @@
-# fullgame
+# ChickyZ
 
 > A Vue.js project
 
