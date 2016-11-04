@@ -1,7 +1,7 @@
 <template>
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :move="move" :time="time" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :time="time" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -20,11 +20,11 @@ import Game from './components/Game'
 import PopUp from './components/PopUp'
 import firebase from 'firebase'
 var config = {
-  apiKey: 'AIzaSyDI7TmN6g-aS8rIvzdWPu0KTtFe0_HW0A4',
-  authDomain: 'todos-4ded8.firebaseapp.com',
-  databaseURL: 'https://todos-4ded8.firebaseio.com',
-  storageBucket: 'todos-4ded8.appspot.com',
-  messagingSenderId: '245537528887'
+  apiKey: 'AIzaSyCPjSZnxBY9KLykYc18iW4yNVTbQyaBPsU',
+  authDomain: 'chickyz-afcfe.firebaseapp.com',
+  databaseURL: 'https://chickyz-afcfe.firebaseio.com',
+  storageBucket: 'chickyz-afcfe.appspot.com',
+  messagingSenderId: '763551736427'
 }
 firebase.initializeApp(config)
 
@@ -86,7 +86,7 @@ export default {
         vm.myAvatar.speed = snapshot.val().speed
         vm.myAvatar.eat = snapshot.val().eat
         vm.myAvatar.score = snapshot.val().score
-        if (vm.myAvatar.score === undefined) {
+        if (vm.myAvatar.score === undefined || vm.myAvatar.score < 0) {
           vm.myAvatar.id = ''
           vm.wait = true
           vm.waitingTime = 3
@@ -145,7 +145,6 @@ export default {
       c,
       myAvatar: {
         name: '',
-        // color: `${chickColor}`, // color: `rgb(${r}, ${g}, ${b})`,
         x: 0,
         y: 0,
         face: '',
@@ -200,6 +199,7 @@ export default {
       // *** ranks
       firebase.database().ref('avatars/' + myId).remove()
       vm.addAvatar(vm.myAvatar)
+      vm.move(vm.time)
       vm.foodsGen()
     },
     letPlay () {
@@ -230,6 +230,11 @@ export default {
       if (e.key === 'x') {
         this.shutup()
       }
+      if (e.key === 'Enter') {
+        if (this.checkName !== false) {
+          this.letPlay()
+        }
+      }
     },
     downKey (e) {
       if (e.keyCode === 17) {
@@ -253,6 +258,7 @@ export default {
       vm.myAvatar.eat = false
       vm.myAvatar.king = false
       vm.myAvatar.score = 0
+      vm.myAvatar.name = vm.myAvatar.name.substring(0, 7)
       let result = Avatars.push(newAvatar)
       this.myAvatar.id = result.key
       myId = this.myAvatar.id
@@ -281,18 +287,19 @@ export default {
       var e2 = 0
       clearInterval(vm.active)
       vm.active = setInterval(function () {
-        if (i === 10) {
-          x1 = vm.mouseX
-          y1 = vm.mouseY
-          dx = Math.abs(x1 - xCenter)
-          dy = Math.abs(y1 - yCenter)
-          checkX = (xCenter < x1) ? 5 : -5
-          checkY = (yCenter < y1) ? 5 : -5
-          err = dx - dy
-          e2 = 2 * err
-          i = 0
+        if (x1 !== vm.mouseX || y1 !== vm.mouseY) {
+          if (i > 10) {
+            x1 = vm.mouseX
+            y1 = vm.mouseY
+            dx = Math.abs(x1 - xCenter)
+            dy = Math.abs(y1 - yCenter)
+            checkX = (xCenter < x1) ? 5 : -5
+            checkY = (yCenter < y1) ? 5 : -5
+            err = dx - dy
+            i = 0
+          }
+          i++
         }
-        i++
         if (!(((xCenter + 25 > x1) && (xCenter - 25 < x1)) && ((yCenter - 25 < y1) && (yCenter + 25 > y1)))) {
           if (vm.active && vm.myAvatar.id !== '') {
             firebase.database().ref('avatars/' + vm.myAvatar.id).update({
@@ -300,7 +307,7 @@ export default {
               x: xOrigin
             })
           }
-
+          e2 = 2 * err
           if (e2 > -dy) {
             err -= dy
             xOrigin += checkX
@@ -310,17 +317,16 @@ export default {
             yOrigin += checkY
           }
           // check out of area
-          if (yOrigin < -20 && y1 < yCenter) {
-            yOrigin = -20
-          }
           if (xOrigin < 0 && x1 < xCenter) {
             xOrigin = 0
-          }
-          if (yOrigin > 2845 && y1 > yCenter) {
-            yOrigin = 2845
-          }
-          if (xOrigin > 2898 && x1 > xCenter) {
+          } else if (xOrigin > 2898 && x1 > xCenter) {
             xOrigin = 2898
+          }
+
+          if (yOrigin < -20 && y1 < yCenter) {
+            yOrigin = -20
+          } else if (yOrigin > 2845 && y1 > yCenter) {
+            yOrigin = 2845
           }
         }
       }, time)
@@ -394,14 +400,13 @@ export default {
             firebase.database().ref('avatars/' + vm.myAvatar.id).update({
               score: vm.myAvatar.score
             })
-          } else {
-            firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += 5
-            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-              score: vm.myAvatar.score
-            })
           }
         }
+        firebase.database().ref('avatars/' + eatChick.id).remove()
+        vm.myAvatar.score += 5
+        firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+          score: vm.myAvatar.score
+        })
       }
       if (vm.myAvatar.score < 0) {
         clearInterval(vm.active)
@@ -473,7 +478,7 @@ export default {
       var newfood
       var vm = this
       var length = 0
-      var genfood = Math.floor(Math.random() * 4) + 1
+      var genfood = Math.floor(Math.random() * 5) + 1
       var color = ''
       if (genfood === 1) {
         color = '#F5FF5D'
@@ -492,17 +497,27 @@ export default {
       }
       vm.addfood(newfood)
       setInterval(function () {
-        if (length < 20) {
+        if (length < 30) {
+          genfood = Math.floor(Math.random() * 5) + 1
+          if (genfood === 1) {
+            color = '#F5FF5D'
+          } else if (genfood === 2) {
+            color = '#AEFBE9'
+          } else if (genfood === 3) {
+            color = '#FC665A'
+          } else {
+            color = ''
+          }
           newfood = {
             pic: genfood,
-            color: Math.floor(Math.random() * 4) + 1,
+            color,
             x: Math.floor(Math.random() * 2800) + 50,
             y: Math.floor(Math.random() * 2778) + 50
           }
           vm.addfood(newfood)
           length = vm.foods.length
         }
-      }, 1000 * 60 * 10)
+      }, 1000 * 60 * 4)
     },
     addfood (newfood) {
       Foods.push(newfood)

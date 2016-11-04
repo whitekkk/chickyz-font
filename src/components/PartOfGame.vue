@@ -1,6 +1,6 @@
 <template>
   <div @mousemove="mousePosition()">
-    <div class="screen" @mouseover="move(time)">
+    <div class="screen">
 
       <div class="foods" :style="{'top': food.y-myAvatar.y+halfHeight + 'px', 'left': food.x-myAvatar.x+halfWidth + 'px'}" v-for="food in foods">
           <food :food="food"></food>
@@ -25,7 +25,7 @@ import Food from './Food'
 import ScoreAndTarget from './ScoreAndTarget'
 
 export default {
-  props: ['mousePosition', 'move', 'time', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods'],
+  props: ['mousePosition', 'time', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods'],
   components: {
     Avatar,
     RankBoard,
