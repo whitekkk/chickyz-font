@@ -3,7 +3,7 @@
     &nbsp;
     <h2 style="color: #CCCCCC; font-size:2em; position:absolute;">
         <br><br>
-        Score &lt; 0 , Consumed , Nood is Die
+        Score &lt; 0 , Consumed , Noob is Die
       </h2>
     <h4 style="color: #CCCCCC;">
       </h4>

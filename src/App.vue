@@ -104,6 +104,15 @@ export default {
       item.id = snapshot.key
       vm.foods.push(item)
     })
+    Foods.on('child_changed', function (snapshot) {
+      var id = snapshot.key
+      var food = vm.foods.find(food => food.id === id)
+      food.color = snapshot.val().color
+      food.pic = snapshot.val().pic
+      food.x = snapshot.val().x
+      food.y = snapshot.val().y
+      // change
+    })
     Foods.on('child_removed', function (snapshot) {
       var id = snapshot.key
       vm.foods.splice(vm.foods.findIndex(food => food.id === id), 1)
@@ -393,7 +402,7 @@ export default {
               score: vm.myAvatar.score
             })
           }
-        } else {
+        } else if (vm.myAvatar.color === '#FC665A') {
           if (eatChick.color === '#F5FF5D') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
             vm.myAvatar.score += (eatChick.score / 2) + 10
@@ -402,11 +411,13 @@ export default {
             })
           }
         }
-        firebase.database().ref('avatars/' + eatChick.id).remove()
-        vm.myAvatar.score += 5
-        firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-          score: vm.myAvatar.score
-        })
+        if (Object.keys(eatChick).length === 3) {
+          firebase.database().ref('avatars/' + eatChick.id).remove()
+          vm.myAvatar.score += 5
+          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+            score: vm.myAvatar.score
+          })
+        }
       }
       if (vm.myAvatar.score < 0) {
         clearInterval(vm.active)
@@ -478,24 +489,8 @@ export default {
       var newfood
       var vm = this
       var length = 0
-      var genfood = Math.floor(Math.random() * 5) + 1
+      var genfood = 0
       var color = ''
-      if (genfood === 1) {
-        color = '#F5FF5D'
-      } else if (genfood === 2) {
-        color = '#AEFBE9'
-      } else if (genfood === 3) {
-        color = '#FC665A'
-      } else {
-        color = ''
-      }
-      newfood = {
-        pic: genfood,
-        color,
-        x: Math.floor(Math.random() * 2800) + 50,
-        y: Math.floor(Math.random() * 2778) + 50
-      }
-      vm.addfood(newfood)
       setInterval(function () {
         if (length < 30) {
           genfood = Math.floor(Math.random() * 5) + 1
@@ -517,7 +512,7 @@ export default {
           vm.addfood(newfood)
           length = vm.foods.length
         }
-      }, 1000 * 60 * 4)
+      }, 1000 * 60 * 5)
     },
     addfood (newfood) {
       Foods.push(newfood)
