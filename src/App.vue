@@ -99,7 +99,6 @@ export default {
       vm.avatars.splice(vm.avatars.findIndex(avatar => avatar.id === id), 1)
       // vm.checkName = true ***`แก้ซะ`
     })
-    vm.foodsGen()
     Foods.on('child_added', function (snapshot) {
       var item = snapshot.val()
       item.id = snapshot.key
@@ -201,6 +200,7 @@ export default {
       // *** ranks
       firebase.database().ref('avatars/' + myId).remove()
       vm.addAvatar(vm.myAvatar)
+      vm.foodsGen()
     },
     letPlay () {
       let vm = this
@@ -339,11 +339,15 @@ export default {
       vm.foods.splice(index, 1)
       if (eatFood !== undefined) {
         firebase.database().ref('foods/' + eatFood.id).remove()
-        if (vm.myAvatar.score < 10) {
-          vm.myAvatar.score = -1
+        if (eatFood.color !== '') {
+          if (vm.myAvatar.score < 5) {
+            vm.myAvatar.score = -1
+          }
+          vm.myAvatar.score /= 2
+          vm.myAvatar.color = eatFood.color
+        } else {
+          vm.myAvatar.score += 2
         }
-        vm.myAvatar.score /= 2
-        vm.myAvatar.color = eatFood.color
 
         if (vm.myAvatar.color === '#F5FF5D') {
           vm.target = '#AEFBE9'
@@ -363,7 +367,7 @@ export default {
       check = 0
       eatChick = vm.avatars.find(avatar => {
         index++
-        check = ((((avatar.x < vm.myAvatar.x + 25) && (avatar.x > vm.myAvatar.x - 25)) && ((avatar.y < vm.myAvatar.y + 25) && (avatar.y > vm.myAvatar.y - 25))) && avatar.id !== vm.myAvatar.id)
+        check = ((((avatar.x < vm.myAvatar.x + 50) && (avatar.x > vm.myAvatar.x - 50)) && ((avatar.y < vm.myAvatar.y + 50) && (avatar.y > vm.myAvatar.y - 50))) && avatar.id !== vm.myAvatar.id)
         return (check)
       })
       if (eatChick !== undefined) {
@@ -450,7 +454,8 @@ export default {
         this.myAvatar.face = this.myAvatar.face.toString()
         if (this.myAvatar.face.search('-0') === -1 && !this.myAvatar.eat) {
           firebase.database().ref('avatars/' + this.myAvatar.id).update({
-            eat: true
+            eat: true,
+            face: this.myAvatar.face + '-0'
           })
         }
         this.checkEat()
@@ -468,14 +473,16 @@ export default {
       var newfood
       var vm = this
       var length = 0
-      var genfood = Math.floor(Math.random() * 3) + 1
+      var genfood = Math.floor(Math.random() * 4) + 1
       var color = ''
       if (genfood === 1) {
         color = '#F5FF5D'
       } else if (genfood === 2) {
         color = '#AEFBE9'
-      } else {
+      } else if (genfood === 3) {
         color = '#FC665A'
+      } else {
+        color = ''
       }
       newfood = {
         pic: genfood,
@@ -485,10 +492,10 @@ export default {
       }
       vm.addfood(newfood)
       setInterval(function () {
-        if (length < 10) {
+        if (length < 20) {
           newfood = {
             pic: genfood,
-            color: Math.floor(Math.random() * 3) + 1,
+            color: Math.floor(Math.random() * 4) + 1,
             x: Math.floor(Math.random() * 2800) + 50,
             y: Math.floor(Math.random() * 2778) + 50
           }
