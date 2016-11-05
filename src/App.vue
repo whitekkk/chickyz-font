@@ -233,25 +233,23 @@ export default {
       }
     },
     upKey (e) {
-      if (e.key === 'z') {
+      if (e.keyCode === 90) {
         this.normalSpeed()
       }
-      if (e.key === 'x') {
+      if (e.keyCode === 88) {
         this.shutup()
       }
-      if (e.key === 'Enter') {
+      if (e.keyCode === 13) {
         if (this.checkName !== false) {
           this.letPlay()
         }
       }
     },
     downKey (e) {
-      if (e.keyCode === 17) {
-      }
-      if (e.key === 'z') {
+      if (e.keyCode === 90) {
         this.upSpeed()
       }
-      if (e.key === 'x') {
+      if (e.keyCode === 88) {
         this.eat()
       }
     },

@@ -6,7 +6,7 @@
           </div>
         </h5>
 
-    <h3 style="font-size: 1.5em; position: absolute; right:20px; bottom: 0;">
+    <h3 style="color: #FFFFFF; text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -3px black; font-size: 1.5em; position: absolute; right:20px; bottom: 0;">
           Score <br> {{myAvatar.score}}
         </h3>
   </div>

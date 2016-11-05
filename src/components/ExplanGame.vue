@@ -1,7 +1,7 @@
 <template>
   <div>
     &nbsp;
-    <h2 style="color: #CCCCCC; font-size:2em; position:absolute;">
+    <h2 style="color: #FFFFFF; text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -3px black; font-size:2em; position:absolute;">
         <br><br>
         Score &lt; 0 , Consumed , Noob is Die
       </h2>
