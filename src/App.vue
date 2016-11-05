@@ -135,15 +135,13 @@ export default {
     return {
       target: '',
       checkFull: false,
-      winHeight,
-      winWidth,
       halfHeight: winHeight / 2,
       halfWidth: winWidth / 2,
       mouseX: 0,
       mouseY: 0,
       avatars: [],
       foods: [],
-      time: 20,
+      time: 10,
       checkName: true,
       active: false,
       waitingTime: 3,
@@ -199,10 +197,8 @@ export default {
     gameStart () {
       let vm = this
       setInterval(function () {
-        vm.winHeight = window.innerHeight
-        vm.winWidth = window.innerWidth
-        vm.halfHeight = vm.winHeight / 2
-        vm.halfWidth = vm.winWidth / 2
+        vm.halfHeight = window.innerHeight / 2
+        vm.halfWidth = window.innerWidth / 2
         vm.avatars.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
       }, 300)
       // *** ranks
@@ -279,16 +275,16 @@ export default {
     },
     move (time) {
       let vm = this
-      let xCenter = vm.winWidth / 2
-      let yCenter = vm.winHeight / 2
+      let xCenter = vm.halfWidth
+      let yCenter = vm.halfHeight
       var xOrigin = vm.myAvatar.x
       var yOrigin = vm.myAvatar.y
       var x1 = vm.mouseX
       var y1 = vm.mouseY
       var dx = Math.abs(x1 - xCenter)
       var dy = Math.abs(y1 - yCenter)
-      var checkX = (xCenter < x1) ? 5 : -5
-      var checkY = (yCenter < y1) ? 5 : -5
+      var checkX = (xCenter < x1) ? 2 : -2
+      var checkY = (yCenter < y1) ? 2 : -2
       var err = dx - dy
       let i = 1
       var e2 = 0
@@ -296,12 +292,14 @@ export default {
       vm.active = setInterval(function () {
         if ((x1 !== vm.mouseX || y1 !== vm.mouseY)) {
           if (i > 10) {
+            xCenter = vm.halfWidth
+            yCenter = vm.halfHeight
             x1 = vm.mouseX
             y1 = vm.mouseY
             dx = Math.abs(x1 - xCenter)
             dy = Math.abs(y1 - yCenter)
-            checkX = (xCenter < x1) ? 5 : -5
-            checkY = (yCenter < y1) ? 5 : -5
+            checkX = (xCenter < x1) ? 2 : -2
+            checkY = (yCenter < y1) ? 2 : -2
             err = dx - dy
             i = 0
           }
@@ -447,7 +445,7 @@ export default {
     },
     upSpeed () {
       if (!this.myAvatar.speed) {
-        this.time = 10
+        this.time = 0
         clearInterval(this.active)
         if (this.waitingTime === 0) {
           this.move(this.time)
@@ -458,7 +456,7 @@ export default {
       }
     },
     normalSpeed () {
-      this.time = 20
+      this.time = 10
       clearInterval(this.active)
       if (this.checkName === false) {
         this.move(this.time)
@@ -512,9 +510,9 @@ export default {
             y: Math.floor(Math.random() * 2778) + 50
           }
           vm.addfood(newfood)
-          length = vm.foods.length
         }
-      }, 1000 * 60 * 5)
+        length = vm.foods.length
+      }, 1000 * 1 * 1)
     },
     addfood (newfood) {
       Foods.push(newfood)
