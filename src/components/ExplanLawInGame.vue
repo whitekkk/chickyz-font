@@ -4,7 +4,7 @@
           z to run <br>
           x to eat <br>
           White rice 2 point <br>
-          ** Warning eat color rice use score / 2 ,if you have 0 score you die. **
+          ** Warning You can eat color rice when your score more than 5 **
         </h5>
   </div>
 </template>

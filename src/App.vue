@@ -287,16 +287,16 @@ export default {
       var yOrigin = vm.myAvatar.y
       var x1 = vm.mouseX
       var y1 = vm.mouseY
-      var dx = 0
-      var dy = 0
-      var checkX = 1
-      var checkY = 1
-      var err = 0
+      var dx = Math.abs(x1 - xCenter)
+      var dy = Math.abs(y1 - yCenter)
+      var checkX = (xCenter < x1) ? 5 : -5
+      var checkY = (yCenter < y1) ? 5 : -5
+      var err = dx - dy
       let i = 1
       var e2 = 0
       clearInterval(vm.active)
       vm.active = setInterval(function () {
-        if (x1 !== vm.mouseX || y1 !== vm.mouseY) {
+        if ((x1 !== vm.mouseX || y1 !== vm.mouseY)) {
           if (i > 10) {
             x1 = vm.mouseX
             y1 = vm.mouseY
@@ -336,6 +336,10 @@ export default {
             yOrigin = -20
           } else if (yOrigin > 2845 && y1 > yCenter) {
             yOrigin = 2845
+          }
+
+          if (vm.myAvatar.color === undefined) {
+            yOrigin = -500
           }
         }
       }, time)
