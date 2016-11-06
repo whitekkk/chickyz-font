@@ -120,10 +120,8 @@ div.rankingBoard {
 }
 div.miniMap {
   z-index : 1000;
-  top: 1%;
-  right: 125px;
-  height: 231.04px;
-  width: 240.0px;
+  top: 275px;
+  right: 5px;
   position: absolute;
   background-color:#FFFFFFF;
   opacity:0.9;filter:alpha(opacity=20);

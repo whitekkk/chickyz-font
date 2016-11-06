@@ -10,6 +10,7 @@
         </div>
         <div style="position: absolute; right:0; display: inline-block;">
           {{avatar.score}}
+          &nbsp;
         </div>
       </h6>
   </div>

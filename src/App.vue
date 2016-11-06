@@ -1,7 +1,7 @@
 <template>
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :ranking="ranking"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -133,6 +133,7 @@ export default {
     }
 
     return {
+      mapSize: 0.03,
       ranking: [],
       target: '',
       checkFull: false,
@@ -235,24 +236,31 @@ export default {
       }
     },
     upKey (e) {
-      if (e.keyCode === 90) {
-        this.normalSpeed()
-      }
-      if (e.keyCode === 88) {
-        this.shutup()
-      }
-      if (e.keyCode === 13) {
-        if (this.checkName !== false) {
-          this.letPlay()
+      if (this.waitingTime === 0) {
+        if (e.keyCode === 77) {
+          this.mapResize()
+        }
+        if (e.keyCode === 90) {
+          this.normalSpeed()
+        }
+        if (e.keyCode === 88) {
+          this.shutup()
+        }
+        if (e.keyCode === 13) {
+          if (this.checkName !== false) {
+            this.letPlay()
+          }
         }
       }
     },
     downKey (e) {
-      if (e.keyCode === 90) {
-        this.upSpeed()
-      }
-      if (e.keyCode === 88) {
-        this.eat()
+      if (this.waitingTime === 0) {
+        if (e.keyCode === 90) {
+          this.upSpeed()
+        }
+        if (e.keyCode === 88) {
+          this.eat()
+        }
       }
     },
     addAvatar (newAvatar) {
@@ -459,42 +467,34 @@ export default {
     upSpeed () {
       if (!this.myAvatar.speed) {
         // clearInterval(this.active)
-        if (this.waitingTime === 0) {
-          this.move(3)
-          firebase.database().ref('avatars/' + this.myAvatar.id).update({
-            speed: true
-          })
-        }
+        this.move(3)
+        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+          speed: true
+        })
       }
     },
     normalSpeed () {
       // clearInterval(this.active)
-      if (this.checkName === false) {
-        this.move(1)
-        firebase.database().ref('avatars/' + this.myAvatar.id).update({
-          speed: false
-        })
-      }
+      this.move(1)
+      firebase.database().ref('avatars/' + this.myAvatar.id).update({
+        speed: false
+      })
     },
     eat () {
-      if (this.waitingTime === 0) {
-        this.myAvatar.face = this.myAvatar.face.toString()
-        if (this.myAvatar.face.search('-0') === -1 && !this.myAvatar.eat) {
-          firebase.database().ref('avatars/' + this.myAvatar.id).update({
-            eat: true,
-            face: this.myAvatar.face + '-0'
-          })
-        }
-        this.checkEat()
-      }
-    },
-    shutup () {
-      if (this.waitingTime === 0) {
+      this.myAvatar.face = this.myAvatar.face.toString()
+      if (this.myAvatar.face.search('-0') === -1 && !this.myAvatar.eat) {
         firebase.database().ref('avatars/' + this.myAvatar.id).update({
-          face: this.myAvatar.face.replace('-0', ''),
-          eat: false
+          eat: true,
+          face: this.myAvatar.face + '-0'
         })
       }
+      this.checkEat()
+    },
+    shutup () {
+      firebase.database().ref('avatars/' + this.myAvatar.id).update({
+        face: this.myAvatar.face.replace('-0', ''),
+        eat: false
+      })
     },
     foodsGen () {
       var newfood
@@ -530,6 +530,14 @@ export default {
     },
     addfood (newfood) {
       Foods.push(newfood)
+    },
+    mapResize () {
+      let vm = this
+      if (vm.mapSize === 0.03) {
+        vm.mapSize = 0.08
+      } else {
+        vm.mapSize = 0.03
+      }
     }
   }
 }
