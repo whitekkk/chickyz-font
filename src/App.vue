@@ -396,25 +396,31 @@ export default {
           if (eatChick.color === '#AEFBE9') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
             vm.myAvatar.score += (eatChick.score / 2) + 10
-            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-              score: vm.myAvatar.score
-            })
+            if (vm.myAvatar.id !== '') {
+              firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+                score: vm.myAvatar.score
+              })
+            }
           }
         } else if (vm.myAvatar.color === '#AEFBE9') {
           if (eatChick.color === '#FC665A') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
             vm.myAvatar.score += (eatChick.score / 2) + 10
-            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-              score: vm.myAvatar.score
-            })
+            if (vm.myAvatar.id !== '') {
+              firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+                score: vm.myAvatar.score
+              })
+            }
           }
         } else if (vm.myAvatar.color === '#FC665A') {
           if (eatChick.color === '#F5FF5D') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
             vm.myAvatar.score += (eatChick.score / 2) + 10
-            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-              score: vm.myAvatar.score
-            })
+            if (vm.myAvatar.id !== '') {
+              firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+                score: vm.myAvatar.score
+              })
+            }
           }
         }
         if (Object.keys(eatChick).length === 3) {
