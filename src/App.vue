@@ -158,7 +158,6 @@ export default {
         color,
         speed: false,
         eat: false,
-        king: false,
         score: 0
       }
     }
@@ -266,7 +265,6 @@ export default {
       vm.myAvatar.color = color
       vm.myAvatar.speed = false
       vm.myAvatar.eat = false
-      vm.myAvatar.king = false
       vm.myAvatar.score = 0
       vm.myAvatar.name = vm.myAvatar.name.substring(0, 7)
       let result = Avatars.push(newAvatar)
