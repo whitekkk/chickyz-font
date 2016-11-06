@@ -358,14 +358,14 @@ export default {
         check = ((food.x < vm.myAvatar.x + 50) && (food.x > vm.myAvatar.x - 50)) && ((food.y < vm.myAvatar.y + 50) && (food.y > vm.myAvatar.y - 50))
         return (check)
       })
-      vm.foods.splice(index, 1)
+      vm.foods.splice(index, 0)
       if (eatFood !== undefined) {
         firebase.database().ref('foods/' + eatFood.id).remove()
         if (eatFood.color !== '') {
           if (vm.myAvatar.score < 5) {
             vm.myAvatar.score = -1
           }
-          vm.myAvatar.score /= 2
+          vm.myAvatar.score = Math.ceil(vm.myAvatar.score / 2)
           vm.myAvatar.color = eatFood.color
         } else {
           vm.myAvatar.score += 2
@@ -382,6 +382,7 @@ export default {
           color: vm.myAvatar.color,
           score: vm.myAvatar.score
         })
+        console.log(vm.foods.length)
       }
       // *chekeat chick
       var eatChick = 0
@@ -526,7 +527,6 @@ export default {
           vm.addfood(newfood)
         }
         length = vm.foods.length
-        console.log(length)
       }, 10000)
     },
     addfood (newfood) {

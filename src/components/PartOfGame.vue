@@ -12,8 +12,6 @@
 
       <rank-board :ranking="ranking"></rank-board>
 
-      <explan-law-in-game></explan-law-in-game>
-
       <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
 
     </div>
@@ -25,7 +23,6 @@ import Avatar from './Avatar'
 import RankBoard from './RankBoard'
 import Food from './Food'
 import ScoreAndTarget from './ScoreAndTarget'
-import ExplanLawInGame from './ExplanLawInGame'
 
 export default {
   props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'ranking'],
@@ -33,8 +30,7 @@ export default {
     Avatar,
     RankBoard,
     Food,
-    ScoreAndTarget,
-    ExplanLawInGame
+    ScoreAndTarget
   }
 }
 </script>

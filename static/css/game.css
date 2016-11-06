@@ -136,6 +136,15 @@ div.logo {
   padding: 60px 0;
   width: 100%
 }
+div.law {
+  position: fixed;
+  top: 85%;
+  left: 50%;
+  width: 400px;
+  height: 150px;
+  margin-top: -100px;
+  margin-left: -200px;
+}
 a.name {
   font-weight: bolder;
   color: #FFFFFF;
