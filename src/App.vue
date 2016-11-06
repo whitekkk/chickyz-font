@@ -423,7 +423,7 @@ export default {
             }
           }
         }
-        if (Object.keys(eatChick).length === 3) {
+        if (Object.keys(eatChick).length === 3 || eatChick.score === undefined) {
           firebase.database().ref('avatars/' + eatChick.id).remove()
           vm.myAvatar.score += 5
           firebase.database().ref('avatars/' + vm.myAvatar.id).update({
