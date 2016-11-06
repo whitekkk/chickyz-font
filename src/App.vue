@@ -378,11 +378,12 @@ export default {
         } else {
           vm.target = '#F5FF5D'
         }
-        firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-          color: vm.myAvatar.color,
-          score: vm.myAvatar.score
-        })
-        console.log(vm.foods.length)
+        if (vm.myAvatar.id !== '') {
+          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+            color: vm.myAvatar.color,
+            score: vm.myAvatar.score
+          })
+        }
       }
       // *chekeat chick
       var eatChick = 0
