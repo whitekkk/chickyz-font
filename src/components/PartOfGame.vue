@@ -28,7 +28,7 @@ import ScoreAndTarget from './ScoreAndTarget'
 import ExplanLawInGame from './ExplanLawInGame'
 
 export default {
-  props: ['mousePosition', 'time', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'ranking'],
+  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'ranking'],
   components: {
     Avatar,
     RankBoard,

@@ -1,7 +1,7 @@
 <template>
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :time="time" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :ranking="ranking"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :ranking="ranking"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -142,7 +142,6 @@ export default {
       mouseY: 0,
       avatars: [],
       foods: [],
-      time: 10,
       checkName: true,
       active: false,
       waitingTime: 3,
@@ -197,16 +196,21 @@ export default {
     },
     gameStart () {
       let vm = this
+      let count = 0
       setInterval(function () {
         vm.halfHeight = window.innerHeight / 2
         vm.halfWidth = window.innerWidth / 2
-        vm.ranking = vm.avatars
-        vm.ranking.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
+        count++
+        if (count === 3) {
+          vm.ranking = vm.avatars
+          vm.ranking.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
+          count = 0
+        }
       }, 300)
       // *** ranks
       firebase.database().ref('avatars/' + myId).remove()
       vm.addAvatar(vm.myAvatar)
-      vm.move(vm.time)
+      vm.move(1)
       vm.foodsGen()
     },
     letPlay () {
@@ -275,7 +279,7 @@ export default {
         vm.target = '#F5FF5D'
       }
     },
-    move (time) {
+    move (step) {
       let vm = this
       let xCenter = vm.halfWidth
       let yCenter = vm.halfHeight
@@ -285,8 +289,8 @@ export default {
       var y1 = vm.mouseY
       var dx = Math.abs(x1 - xCenter)
       var dy = Math.abs(y1 - yCenter)
-      var checkX = (xCenter < x1) ? 2 : -2
-      var checkY = (yCenter < y1) ? 2 : -2
+      var checkX = (xCenter < x1) ? step : -step
+      var checkY = (yCenter < y1) ? step : -step
       var err = dx - dy
       let i = 1
       var e2 = 0
@@ -300,8 +304,8 @@ export default {
             y1 = vm.mouseY
             dx = Math.abs(x1 - xCenter)
             dy = Math.abs(y1 - yCenter)
-            checkX = (xCenter < x1) ? 2 : -2
-            checkY = (yCenter < y1) ? 2 : -2
+            checkX = (xCenter < x1) ? step : -step
+            checkY = (yCenter < y1) ? step : -step
             err = dx - dy
             i = 0
           }
@@ -340,7 +344,7 @@ export default {
             yOrigin = -500
           }
         }
-      }, time)
+      }, 10)
     },
     checkEat () {
       var vm = this
@@ -447,10 +451,9 @@ export default {
     },
     upSpeed () {
       if (!this.myAvatar.speed) {
-        this.time = 0
         // clearInterval(this.active)
         if (this.waitingTime === 0) {
-          this.move(this.time)
+          this.move(3)
           firebase.database().ref('avatars/' + this.myAvatar.id).update({
             speed: true
           })
@@ -458,10 +461,9 @@ export default {
       }
     },
     normalSpeed () {
-      this.time = 10
       // clearInterval(this.active)
       if (this.checkName === false) {
-        this.move(this.time)
+        this.move(1)
         firebase.database().ref('avatars/' + this.myAvatar.id).update({
           speed: false
         })
@@ -495,7 +497,10 @@ export default {
       var color = ''
       setInterval(function () {
         if (length < 30) {
-          genfood = Math.floor(Math.random() * 5) + 1
+          genfood = Math.floor(Math.random() * 7) + 1
+          if (genfood > 5) {
+            genfood = 5
+          }
           if (genfood === 1) {
             color = '#F5FF5D'
           } else if (genfood === 2) {
@@ -514,7 +519,7 @@ export default {
           vm.addfood(newfood)
         }
         length = vm.foods.length
-      }, 1000 * 1 * 1)
+      }, 1000 * 60 * 1)
     },
     addfood (newfood) {
       Foods.push(newfood)
