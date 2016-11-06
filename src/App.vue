@@ -1,7 +1,7 @@
 <template>
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :time="time" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :time="time" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :ranking="ranking"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -133,6 +133,7 @@ export default {
     }
 
     return {
+      ranking: [],
       target: '',
       checkFull: false,
       halfHeight: winHeight / 2,
@@ -199,7 +200,8 @@ export default {
       setInterval(function () {
         vm.halfHeight = window.innerHeight / 2
         vm.halfWidth = window.innerWidth / 2
-        vm.avatars.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
+        vm.ranking = vm.avatars
+        vm.ranking.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
       }, 300)
       // *** ranks
       firebase.database().ref('avatars/' + myId).remove()
@@ -446,7 +448,7 @@ export default {
     upSpeed () {
       if (!this.myAvatar.speed) {
         this.time = 0
-        clearInterval(this.active)
+        // clearInterval(this.active)
         if (this.waitingTime === 0) {
           this.move(this.time)
           firebase.database().ref('avatars/' + this.myAvatar.id).update({
@@ -457,7 +459,7 @@ export default {
     },
     normalSpeed () {
       this.time = 10
-      clearInterval(this.active)
+      // clearInterval(this.active)
       if (this.checkName === false) {
         this.move(this.time)
         firebase.database().ref('avatars/' + this.myAvatar.id).update({

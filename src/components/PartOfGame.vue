@@ -10,8 +10,8 @@
         <avatar :avatar="avatar" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth"></avatars>
       </div>
 
-      <rank-board :avatars="avatars"></rank-board>
-      
+      <rank-board :ranking="ranking"></rank-board>
+
       <explan-law-in-game></explan-law-in-game>
 
       <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
@@ -28,7 +28,7 @@ import ScoreAndTarget from './ScoreAndTarget'
 import ExplanLawInGame from './ExplanLawInGame'
 
 export default {
-  props: ['mousePosition', 'time', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods'],
+  props: ['mousePosition', 'time', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'ranking'],
   components: {
     Avatar,
     RankBoard,

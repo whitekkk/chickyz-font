@@ -3,7 +3,7 @@
     <h4>&nbsp;&nbsp;
       Ranking <img src="../../static/img/crown.png"/>
       </h4>
-    <div class="ranking" v-for="avatar in avatars">
+    <div class="ranking" v-for="avatar in ranking">
       <ranking :avatar="avatar"></ranking>
     </div>
   </div>
@@ -13,7 +13,7 @@
 import Ranking from './Ranking'
 
 export default {
-  props: ['avatars'],
+  props: ['ranking'],
   components: {
     Ranking
   }
