@@ -503,7 +503,7 @@ export default {
       var color = ''
       setInterval(function () {
         if (length < 30) {
-          genfood = Math.floor(Math.random() * 7) + 1
+          genfood = Math.floor(Math.random() * 10) + 1
           if (genfood > 5) {
             genfood = 5
           }
@@ -533,6 +533,4 @@ export default {
   }
 }
 </script>
-<style
-
-src="../static/css/game.css"> </style>
+<style src="../static/css/game.css"> </style>
