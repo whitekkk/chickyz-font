@@ -48,8 +48,8 @@ div.popUpName {
 div.bgUpName {
   position: fixed;
   opacity:0.4;
-  filter:alpha(opacity=40); /* For IE8 and earlier */
-  background-color:#000000;
+  filter:alpha(opacity=50); /* For IE8 and earlier */
+  background-color:#555555;
   background-size:100%;
   width: 105%;
   height: 105%;

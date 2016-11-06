@@ -204,6 +204,7 @@ export default {
         if (count === 3) {
           vm.ranking = vm.avatars
           vm.ranking.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
+          vm.ranking = vm.ranking.slice(0, 5)
           count = 0
         }
       }, 300)
@@ -395,7 +396,7 @@ export default {
         if (vm.myAvatar.color === '#F5FF5D') {
           if (eatChick.color === '#AEFBE9') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += (eatChick.score / 2) + 10
+            vm.myAvatar.score += Math.floor((eatChick.score / 2)) + 10
             if (vm.myAvatar.id !== '') {
               firebase.database().ref('avatars/' + vm.myAvatar.id).update({
                 score: vm.myAvatar.score
@@ -405,7 +406,7 @@ export default {
         } else if (vm.myAvatar.color === '#AEFBE9') {
           if (eatChick.color === '#FC665A') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += (eatChick.score / 2) + 10
+            vm.myAvatar.score += Math.floor((eatChick.score / 2)) + 10
             if (vm.myAvatar.id !== '') {
               firebase.database().ref('avatars/' + vm.myAvatar.id).update({
                 score: vm.myAvatar.score
@@ -415,7 +416,7 @@ export default {
         } else if (vm.myAvatar.color === '#FC665A') {
           if (eatChick.color === '#F5FF5D') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += (eatChick.score / 2) + 10
+            vm.myAvatar.score += Math.floor((eatChick.score / 2) + 10)
             if (vm.myAvatar.id !== '') {
               firebase.database().ref('avatars/' + vm.myAvatar.id).update({
                 score: vm.myAvatar.score
@@ -504,8 +505,8 @@ export default {
       setInterval(function () {
         if (length < 30) {
           genfood = Math.floor(Math.random() * 10) + 1
-          if (genfood > 5) {
-            genfood = (genfood % 2) + 5
+          if (genfood > 4) {
+            genfood = (genfood % 2) + 4
           }
           if (genfood === 1) {
             color = '#F5FF5D'
@@ -525,7 +526,8 @@ export default {
           vm.addfood(newfood)
         }
         length = vm.foods.length
-      }, 1000 * 60 * 1)
+        console.log(length)
+      }, 1000 * 1 * 1)
     },
     addfood (newfood) {
       Foods.push(newfood)
