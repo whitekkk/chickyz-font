@@ -505,7 +505,7 @@ export default {
         if (length < 30) {
           genfood = Math.floor(Math.random() * 10) + 1
           if (genfood > 5) {
-            genfood = 5
+            genfood = (genfood % 2) + 5
           }
           if (genfood === 1) {
             color = '#F5FF5D'
