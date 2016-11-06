@@ -10,6 +10,8 @@
         <avatar :avatar="avatar" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth"></avatars>
       </div>
 
+      <mini-map :avatars='avatars' :myAvatar="myAvatar" :foods="foods"> </mini-map>
+
       <rank-board :ranking="ranking"></rank-board>
 
       <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
@@ -23,6 +25,7 @@ import Avatar from './Avatar'
 import RankBoard from './RankBoard'
 import Food from './Food'
 import ScoreAndTarget from './ScoreAndTarget'
+import MiniMap from './MiniMap'
 
 export default {
   props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'ranking'],
@@ -30,7 +33,8 @@ export default {
     Avatar,
     RankBoard,
     Food,
-    ScoreAndTarget
+    ScoreAndTarget,
+    MiniMap
   }
 }
 </script>

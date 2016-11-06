@@ -20,8 +20,6 @@ div#outOfArea {
 }
 div.avatar {
   position: absolute;
-  width: 10%;
-  height: 10%;
 }
 div.foods {
   position: absolute;
@@ -115,10 +113,32 @@ div.rankingBoard {
   right: 0;
   height: 250px;
   position: absolute;
-  background-color:#DDDDDD;
+  background-color:#AAAAAA;
   opacity:0.4;filter:alpha(opacity=40);
   overflow:hidden;
   border-radius: 8px;
+}
+div.miniMap {
+  z-index : 1000;
+  top: 1%;
+  right: 125px;
+  height: 231.04px;
+  width: 240.0px;
+  position: absolute;
+  background-color:#FFFFFFF;
+  opacity:0.9;filter:alpha(opacity=20);
+  overflow:hidden;
+  border: 2px solid #CCCCCC;
+}
+div.miniAvatar {
+  width: 8px;
+  height: 8px;
+  border: 0.5px solid #AAAAAA;
+}
+div.miniFood {
+  width: 4px;
+  height: 4px;
+  border: 0.5px solid #AAAAAA;
 }
 div.target {
   position: absolute;
