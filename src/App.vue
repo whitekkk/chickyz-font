@@ -396,7 +396,7 @@ export default {
         if (vm.myAvatar.color === '#F5FF5D') {
           if (eatChick.color === '#AEFBE9') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += Math.floor((eatChick.score / 2)) + 10
+            vm.myAvatar.score += Math.ceil((eatChick.score / 2)) + 10
             if (vm.myAvatar.id !== '') {
               firebase.database().ref('avatars/' + vm.myAvatar.id).update({
                 score: vm.myAvatar.score
@@ -406,7 +406,7 @@ export default {
         } else if (vm.myAvatar.color === '#AEFBE9') {
           if (eatChick.color === '#FC665A') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += Math.floor((eatChick.score / 2)) + 10
+            vm.myAvatar.score += Math.ceil((eatChick.score / 2)) + 10
             if (vm.myAvatar.id !== '') {
               firebase.database().ref('avatars/' + vm.myAvatar.id).update({
                 score: vm.myAvatar.score
@@ -416,7 +416,7 @@ export default {
         } else if (vm.myAvatar.color === '#FC665A') {
           if (eatChick.color === '#F5FF5D') {
             firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += Math.floor((eatChick.score / 2) + 10)
+            vm.myAvatar.score += Math.ceil((eatChick.score / 2) + 10)
             if (vm.myAvatar.id !== '') {
               firebase.database().ref('avatars/' + vm.myAvatar.id).update({
                 score: vm.myAvatar.score
@@ -527,7 +527,7 @@ export default {
         }
         length = vm.foods.length
         console.log(length)
-      }, 1000 * 1 * 1)
+      }, 10000)
     },
     addfood (newfood) {
       Foods.push(newfood)
