@@ -503,8 +503,8 @@ export default {
       var genfood = 0
       var color = ''
       setInterval(function () {
-        if (length < 30) {
-          genfood = Math.floor(Math.random() * 10) + 1
+        if (length < 40) {
+          genfood = Math.floor(Math.random() * 30) + 1
           if (genfood > 4) {
             genfood = (genfood % 2) + 4
           }
@@ -526,7 +526,7 @@ export default {
           vm.addfood(newfood)
         }
         length = vm.foods.length
-      }, 10000)
+      }, 15000)
     },
     addfood (newfood) {
       Foods.push(newfood)

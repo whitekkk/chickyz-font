@@ -7,7 +7,7 @@
       </div>
     </div>
     <div v-for="food in foods">
-      <div v-if="food.color !== ''" class="miniFood" :style="{'position':'absolute','background': food.color,'top': food.y*mapSize + 'px', 'left': food.x*mapSize + 'px'}">
+      <div v-if="food.color !== ''" class="miniFood" :style="{'position':'absolute','background': '#888888','top': food.y*mapSize + 'px', 'left': food.x*mapSize + 'px'}">
       </div>
       <div v-else class="miniFood" :style="{'position':'absolute','background': food.color,'top': food.y*mapSize + 'px', 'left': food.x*mapSize + 'px'}">
       </div>
