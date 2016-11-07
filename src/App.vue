@@ -343,8 +343,8 @@ export default {
 
           if (yOrigin < -20 && y1 < yCenter) {
             yOrigin = -20
-          } else if (yOrigin > 2845 && y1 > yCenter) {
-            yOrigin = 2845
+          } else if (yOrigin > 2860 && y1 > yCenter) {
+            yOrigin = 2860
           }
 
           if (vm.myAvatar.color === undefined) {

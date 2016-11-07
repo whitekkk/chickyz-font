@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img v-if="myAvatar.id === avatar.id" src="../../static/img/gird-bg.png" :style="{'position':'absolute', 'top': -avatar.y + 'px', 'left': -avatar.x + 'px'}" />
+    <img v-if="myAvatar.id === avatar.id" src="../../static/img/grid-bg.png" :style="{'position':'absolute', 'top': -avatar.y + 'px', 'left': -avatar.x + 'px'}" />
     <div style="text-align: center; z-index: 100; position: absolute;">
       <a class="name">
           {{avatar.name}}

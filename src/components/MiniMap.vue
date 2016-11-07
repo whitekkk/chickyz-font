@@ -1,5 +1,5 @@
 <template>
-  <div @click="mapResize" class="miniMap" :style="{'height': 3000*mapSize + 'px','width': 2988*mapSize + 'px'}">
+  <div @click="mapResize" class="miniMap" :style="{'height': 3000*mapSize + 'px','width': 3000*mapSize + 'px'}">
     <div v-for="avatar in avatars" style="position: absolute;">
       <div v-if="myAvatar.id === avatar.id" class="miniAvatar" :style="{'position':'absolute','background': myAvatar.color,'top': avatar.y*mapSize + 'px', 'left': avatar.x*mapSize + 'px'}">
       </div>
