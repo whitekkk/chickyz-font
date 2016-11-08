@@ -132,7 +132,7 @@ export default {
     })
     HOFs.on('child_removed', function (snapshot) {
       var id = snapshot.key
-      vm.hofs.splice(vm.hofs.findIndex(hof => hof.id === id), 1)
+      vm.hOFs.splice(vm.hOFs.findIndex(hof => hof.id === id), 1)
     })
     vm.hOFs.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
   },
@@ -266,10 +266,10 @@ export default {
         if (e.keyCode === 88) {
           this.shutup()
         }
-        if (e.keyCode === 13) {
-          if (this.checkName !== false) {
-            this.letPlay()
-          }
+      }
+      if (e.keyCode === 13) {
+        if (this.checkName !== false) {
+          this.letPlay()
         }
       }
     },
@@ -370,6 +370,9 @@ export default {
           if (vm.myAvatar.color === undefined) {
             yOrigin = -500
           }
+          if (vm.myAvatar.score === undefined) {
+            clearInterval(vm.active)
+          }
         }
       }, 10)
     },
@@ -389,7 +392,7 @@ export default {
         firebase.database().ref('foods/' + eatFood.id).remove()
         if (eatFood.color !== '') {
           if (vm.myAvatar.score < 5) {
-            vm.myAvatar.score = -1
+            vm.myAvatar.score = -2
           }
           vm.myAvatar.score = Math.ceil(vm.myAvatar.score / 2)
           vm.myAvatar.color = eatFood.color
@@ -460,6 +463,7 @@ export default {
           })
         }
       }
+      console.log(myId)
       if (vm.myAvatar.score < 0) {
         clearInterval(vm.active)
         firebase.database().ref('avatars/' + myId).remove()

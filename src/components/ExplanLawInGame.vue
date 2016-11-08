@@ -1,6 +1,6 @@
 <template>
   <div style="position: absolute; left: 5px; bottom: -15px; color: #000000;">
-    <a style="font-size:30px">
+    <a class="explanLaw">
       <center>
           Please Read <br>
           Z = run <br>
