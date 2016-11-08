@@ -55,6 +55,9 @@ div.bgUpName {
   top: -5px;
   left: -5px;
 }
+button.button a {
+  color: white;
+}
 button.button {
   background-color: #4CAF50; /* Green */
   border: none;
@@ -62,8 +65,10 @@ button.button {
   padding: 8px 16px;
   text-align: center;
   text-decoration: none;
+  text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
   display: inline-block;
   font-size: 16px;
+  font-weight: bolder;
   margin: 4px 2px;
   -webkit-transition-duration: 0.4s; /* Safari */
   transition-duration: 0.4s;

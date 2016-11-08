@@ -48,7 +48,7 @@ export default {
     var key = 'value'
     Avatars.on(key, function (snapshot) {
       roomCheck = snapshot.numChildren()
-      if (roomCheck >= 35) {
+      if (roomCheck >= 100) {
         vm.checkFull = true
       }
     })
