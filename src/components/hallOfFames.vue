@@ -12,12 +12,12 @@
 </template>
 
 <script>
-import hallOfFame from './hallOfFame'
+import HallOfFame from './HallOfFame'
 
 export default {
   props: ['hOFs'],
   components: {
-    hallOfFame
+    HallOfFame
   }
 }
 </script>

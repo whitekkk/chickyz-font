@@ -1,7 +1,7 @@
 <template>
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize" :countStep="countStep"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -15,6 +15,10 @@
   js.src = '//connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v2.8'
   fjs.parentNode.insertBefore(js, fjs)
 }(document, 'script', 'facebook-jssdk'))
+
+var Vue = require('vue')
+Vue.config.debug = false
+Vue.config.silent = true
 
 import Game from './components/Game'
 import PopUp from './components/PopUp'
@@ -151,6 +155,7 @@ export default {
     }
 
     return {
+      countStep: 100,
       mapSize: 0.03,
       ranking: [],
       target: '',
@@ -231,7 +236,7 @@ export default {
       // *** ranks
       firebase.database().ref('avatars/' + myId).remove()
       vm.addAvatar(vm.myAvatar)
-      vm.move(1)
+      vm.move(false)
       vm.foodsGen()
     },
     letPlay () {
@@ -306,7 +311,7 @@ export default {
         vm.target = '#F5FF5D'
       }
     },
-    move (step) {
+    move (checkRun) {
       let vm = this
       let xCenter = vm.halfWidth
       let yCenter = vm.halfHeight
@@ -314,6 +319,10 @@ export default {
       var yOrigin = vm.myAvatar.y
       var x1 = vm.mouseX
       var y1 = vm.mouseY
+      var step = 1
+      if (checkRun === true) {
+        step = 4
+      }
       var dx = Math.abs(x1 - xCenter)
       var dy = Math.abs(y1 - yCenter)
       var checkX = (xCenter < x1) ? step : -step
@@ -323,7 +332,17 @@ export default {
       var e2 = 0
       clearInterval(vm.active)
       vm.active = setInterval(function () {
-        if ((x1 !== vm.mouseX || y1 !== vm.mouseY)) {
+        if (checkRun === false && vm.countStep < 100) {
+          step = 1
+          vm.countStep++
+        }
+        if (checkRun === true && vm.countStep > 0) {
+          step = 4
+          vm.countStep--
+        } else {
+          step = 1
+        }
+        if ((x1 !== vm.mouseX || y1 !== vm.mouseY) || vm.countStep === 0) {
           if (i > 10) {
             xCenter = vm.halfWidth
             yCenter = vm.halfHeight
@@ -463,7 +482,6 @@ export default {
           })
         }
       }
-      console.log(myId)
       if (vm.myAvatar.score < 0) {
         clearInterval(vm.active)
         firebase.database().ref('avatars/' + myId).remove()
@@ -491,7 +509,7 @@ export default {
     upSpeed () {
       if (!this.myAvatar.speed) {
         // clearInterval(this.active)
-        this.move(3)
+        this.move(true)
         firebase.database().ref('avatars/' + this.myAvatar.id).update({
           speed: true
         })
@@ -499,7 +517,7 @@ export default {
     },
     normalSpeed () {
       // clearInterval(this.active)
-      this.move(1)
+      this.move(false)
       firebase.database().ref('avatars/' + this.myAvatar.id).update({
         speed: false
       })

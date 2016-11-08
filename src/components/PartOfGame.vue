@@ -16,8 +16,9 @@
 
       <rank-board :ranking="ranking"></rank-board>
 
-      <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
+      <mana :countStep="countStep"></mana>
 
+      <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
     </div>
   </div>
 </template>
@@ -28,17 +29,19 @@ import RankBoard from './RankBoard'
 import Food from './Food'
 import ScoreAndTarget from './ScoreAndTarget'
 import MiniMap from './MiniMap'
-import hallOfFames from './hallOfFames'
+import HallOfFames from './HallOfFames'
+import Mana from './Mana'
 
 export default {
-  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize'],
+  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize', 'countStep'],
   components: {
     Avatar,
     RankBoard,
     Food,
     ScoreAndTarget,
     MiniMap,
-    hallOfFames
+    HallOfFames,
+    Mana
   }
 }
 </script>
