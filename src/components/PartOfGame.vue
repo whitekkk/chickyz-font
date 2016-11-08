@@ -16,7 +16,7 @@
 
       <rank-board :ranking="ranking"></rank-board>
 
-      <mana :countStep="countStep"></mana>
+      <stamina :countStep="countStep"></stamina>
 
       <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
     </div>
@@ -30,7 +30,7 @@ import Food from './Food'
 import ScoreAndTarget from './ScoreAndTarget'
 import MiniMap from './MiniMap'
 import HallOfFames from './HallOfFames'
-import Mana from './Mana'
+import Stamina from './Stamina'
 
 export default {
   props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize', 'countStep'],
@@ -41,7 +41,7 @@ export default {
     ScoreAndTarget,
     MiniMap,
     HallOfFames,
-    Mana
+    Stamina
   }
 }
 </script>
