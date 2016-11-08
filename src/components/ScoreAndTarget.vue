@@ -1,14 +1,14 @@
 <template>
   <div style="text-align: center;">
-    <h5 style="position: absolute; right:140px; bottom: 4%;">
-          Target
-          <div class="target" :style="{'background': target}">
-          </div>
+    <h5 class="score" style="left:140px; bottom: 0%;">
+          Target :
         </h5>
+        <div class="target" :style="{'background': target}">
+        </div>
 
-    <h3 style="color: #FFFFFF; text-shadow: -3px 0 black, 0 3px black, 3px 0 black, 0 -3px black; font-size: 1.5em; position: absolute; right:20px; bottom: 0;">
-          Score <br> {{myAvatar.score}}
-        </h3>
+    <h5 class="score">
+          Score : {{myAvatar.score}}
+        </h5>
   </div>
 </template>
 

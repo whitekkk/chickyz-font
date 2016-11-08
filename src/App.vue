@@ -1,7 +1,7 @@
 <template>
   <div>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -35,6 +35,7 @@ window.onbeforeunload = function () {
 }
 
 var Foods = firebase.database().ref('foods')
+var HOFs = firebase.database().ref('hofs')
 
 export default {
   created () {
@@ -117,6 +118,23 @@ export default {
       var id = snapshot.key
       vm.foods.splice(vm.foods.findIndex(food => food.id === id), 1)
     })
+
+    HOFs.on('child_added', function (snapshot) {
+      var item = snapshot.val()
+      item.id = snapshot.key
+      vm.hOFs.push(item)
+    })
+    HOFs.on('child_changed', function (snapshot) {
+      var id = snapshot.key
+      var hof = vm.hOFs.find(hof => hof.id === id)
+      hof.name = snapshot.val().name
+      hof.score = snapshot.val().score
+    })
+    HOFs.on('child_removed', function (snapshot) {
+      var id = snapshot.key
+      vm.hofs.splice(vm.hofs.findIndex(hof => hof.id === id), 1)
+    })
+    vm.hOFs.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
   },
   data () {
     let winHeight = window.innerHeight
@@ -143,6 +161,7 @@ export default {
       mouseY: 0,
       avatars: [],
       foods: [],
+      hOFs: [],
       checkName: true,
       active: false,
       waitingTime: 3,
@@ -205,6 +224,7 @@ export default {
           vm.ranking = vm.avatars
           vm.ranking.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
           vm.ranking = vm.ranking.slice(0, 5)
+          vm.hOFs.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
           count = 0
         }
       }, 300)
@@ -489,6 +509,7 @@ export default {
         })
       }
       this.checkEat()
+      this.checkHOF()
     },
     shutup () {
       firebase.database().ref('avatars/' + this.myAvatar.id).update({
@@ -497,7 +518,7 @@ export default {
       })
     },
     foodsGen () {
-      var newfood
+      var newFood
       var vm = this
       var length = 0
       var genfood = 0
@@ -517,19 +538,19 @@ export default {
           } else {
             color = ''
           }
-          newfood = {
+          newFood = {
             pic: genfood,
             color,
             x: Math.floor(Math.random() * 2800) + 50,
             y: Math.floor(Math.random() * 2778) + 50
           }
-          vm.addfood(newfood)
+          vm.addFood(newFood)
         }
         length = vm.foods.length
-      }, 15000)
+      }, 10000)
     },
-    addfood (newfood) {
-      Foods.push(newfood)
+    addFood (newFood) {
+      Foods.push(newFood)
     },
     mapResize () {
       let vm = this
@@ -537,6 +558,23 @@ export default {
         vm.mapSize = 0.08
       } else {
         vm.mapSize = 0.03
+      }
+    },
+    checkHOF () {
+      var vm = this
+      if (vm.hOFs.length < 3) {
+        firebase.database().ref('hofs/' + this.myAvatar.id).update({
+          name: vm.myAvatar.name,
+          score: vm.myAvatar.score
+        })
+      } else if (vm.myAvatar.score > vm.hOFs[2].score) {
+        if (this.myAvatar.id !== vm.hOFs[2].id && this.myAvatar.id !== vm.hOFs[1].id && this.myAvatar.id !== vm.hOFs[0].id) {
+          firebase.database().ref('hofs/' + vm.hOFs[2].id).remove()
+        }
+        firebase.database().ref('hofs/' + this.myAvatar.id).update({
+          name: vm.myAvatar.name,
+          score: vm.myAvatar.score
+        })
       }
     }
   }

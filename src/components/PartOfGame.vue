@@ -12,6 +12,8 @@
 
       <mini-map :avatars='avatars' :myAvatar="myAvatar" :foods="foods" :mapSize="mapSize" :mapResize="mapResize"> </mini-map>
 
+      <hall-of-fames :hOFs="hOFs"></hall-of-fames>
+
       <rank-board :ranking="ranking"></rank-board>
 
       <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
@@ -26,15 +28,17 @@ import RankBoard from './RankBoard'
 import Food from './Food'
 import ScoreAndTarget from './ScoreAndTarget'
 import MiniMap from './MiniMap'
+import hallOfFames from './hallOfFames'
 
 export default {
-  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'ranking', 'mapSize', 'mapResize'],
+  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize'],
   components: {
     Avatar,
     RankBoard,
     Food,
     ScoreAndTarget,
-    MiniMap
+    MiniMap,
+    hallOfFames
   }
 }
 </script>

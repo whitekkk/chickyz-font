@@ -87,11 +87,12 @@ input[type=text], select {
   border-radius: 4px;
   box-sizing: border-box;
 }
-div.score {
+h5.score {
   position: absolute;
-  font-family: sans-serif;
+  color: #FFFFFF;
+  text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+  left:20px;
   bottom: 0;
-  right: 0;
 }
 a.ranking {
   position: absolute;
@@ -109,9 +110,22 @@ div.chick {
 }
 div.rankingBoard {
   z-index : 1000;
+  top: 100px;
+  right: 0;
+  height: 140px;
+  width: 90px;
+  position: absolute;
+  background-color:#AAAAAA;
+  opacity:0.4;filter:alpha(opacity=40);
+  overflow:hidden;
+  border-radius: 8px;
+}
+div.hOF {
+  z-index : 1000;
   top: 0;
   right: 0;
-  height: 250px;
+  height: 90px;
+  width: 200px;
   position: absolute;
   background-color:#AAAAAA;
   opacity:0.4;filter:alpha(opacity=40);
@@ -120,8 +134,8 @@ div.rankingBoard {
 }
 div.miniMap {
   z-index : 1000;
-  top: 275px;
-  right: 5px;
+  top: 0;
+  left: 0;
   position: absolute;
   background-color:#FFFFFFF;
   opacity:0.9;filter:alpha(opacity=20);
@@ -140,9 +154,11 @@ div.miniFood {
 }
 div.target {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #000000;
+  bottom: 2%;
+  left: 200px;
 }
 div.logo {
   position: fixed;
@@ -170,7 +186,7 @@ a.name {
   text-shadow: -2.5px 0 black, 0 2.5px black, 2.5px 0 black, 0 -2.5px black;
 }
 a {
-    color: #FFFFFF; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black;
+    color: #000000;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    #BBBBBB;

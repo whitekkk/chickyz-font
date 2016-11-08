@@ -5,6 +5,7 @@
           {{' '}}
         </div>
         <div style="display: inline-block;">
+          &nbsp;
           {{rank.name + ' '}}
         </div>
         <div style="position: absolute; right:0; display: inline-block;">
