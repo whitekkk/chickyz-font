@@ -155,6 +155,7 @@ export default {
     }
 
     return {
+      buttonZ: false,
       countStep: 100,
       mapSize: 0.03,
       ranking: [],
@@ -266,7 +267,7 @@ export default {
           this.mapResize()
         }
         if (e.keyCode === 90) {
-          this.normalSpeed()
+          this.speed()
         }
         if (e.keyCode === 88) {
           this.shutup()
@@ -280,9 +281,6 @@ export default {
     },
     downKey (e) {
       if (this.waitingTime === 0) {
-        if (e.keyCode === 90) {
-          this.upSpeed()
-        }
         if (e.keyCode === 88) {
           this.eat()
         }
@@ -311,7 +309,7 @@ export default {
         vm.target = '#F5FF5D'
       }
     },
-    move (checkRun) {
+    move () {
       let vm = this
       let xCenter = vm.halfWidth
       let yCenter = vm.halfHeight
@@ -320,7 +318,7 @@ export default {
       var x1 = vm.mouseX
       var y1 = vm.mouseY
       var step = 1
-      if (checkRun === true) {
+      if (vm.myAvatar.speed === true) {
         step = 4
       }
       var dx = Math.abs(x1 - xCenter)
@@ -332,31 +330,34 @@ export default {
       var e2 = 0
       clearInterval(vm.active)
       vm.active = setInterval(function () {
-        if (checkRun === false && vm.countStep < 100) {
+        if (!vm.myAvatar.speed && vm.countStep < 100 + vm.myAvatar.score) {
           step = 1
           vm.countStep++
         }
-        if (checkRun === true && vm.countStep > 0) {
+        if (vm.myAvatar.speed && vm.countStep > 0) {
           step = 4
           vm.countStep--
         } else {
           step = 1
+          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+            speed: false
+          })
         }
-        if ((x1 !== vm.mouseX || y1 !== vm.mouseY) || vm.countStep === 0) {
-          if (i > 10) {
-            xCenter = vm.halfWidth
-            yCenter = vm.halfHeight
-            x1 = vm.mouseX
-            y1 = vm.mouseY
-            dx = Math.abs(x1 - xCenter)
-            dy = Math.abs(y1 - yCenter)
-            checkX = (xCenter < x1) ? step : -step
-            checkY = (yCenter < y1) ? step : -step
-            err = dx - dy
-            i = 0
-          }
-          i++
+
+        if (i > 10 || (x1 !== vm.mouseX || y1 !== vm.mouseY) || vm.countStep === 0 || vm.buttonZ) {
+          vm.buttonZ = false
+          xCenter = vm.halfWidth
+          yCenter = vm.halfHeight
+          x1 = vm.mouseX
+          y1 = vm.mouseY
+          dx = Math.abs(x1 - xCenter)
+          dy = Math.abs(y1 - yCenter)
+          checkX = (xCenter < x1) ? step : -step
+          checkY = (yCenter < y1) ? step : -step
+          err = dx - dy
+          i = 0
         }
+        i++
         if (!(((xCenter + 25 > x1) && (xCenter - 25 < x1)) && ((yCenter - 25 < y1) && (yCenter + 25 > y1)))) {
           if (vm.active && vm.myAvatar.id !== '') {
             firebase.database().ref('avatars/' + vm.myAvatar.id).update({
@@ -506,21 +507,19 @@ export default {
         }
       }
     },
-    upSpeed () {
+    speed () {
+      this.buttonZ = true
+      this.move()
       if (!this.myAvatar.speed) {
         // clearInterval(this.active)
-        this.move(true)
         firebase.database().ref('avatars/' + this.myAvatar.id).update({
           speed: true
         })
+      } else {
+        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+          speed: false
+        })
       }
-    },
-    normalSpeed () {
-      // clearInterval(this.active)
-      this.move(false)
-      firebase.database().ref('avatars/' + this.myAvatar.id).update({
-        speed: false
-      })
     },
     eat () {
       this.myAvatar.face = this.myAvatar.face.toString()
