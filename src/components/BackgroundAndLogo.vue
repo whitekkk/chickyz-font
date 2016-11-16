@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="bgUpName"></div>
+    <div class="bgUpName"> </div>
+    <img class="bgUpName" src="../../static/img/bg.jpg"/>
     <div class="logo">
       <img src="../../static/img/logo.gif" />
     </div>

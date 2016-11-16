@@ -1,5 +1,5 @@
 <template>
-  <div style="position: absolute; left: 5px; bottom: -15px;">
+  <div>
     <center>
     <a class="explanLaw">
           Please Read <br>

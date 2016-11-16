@@ -1,5 +1,6 @@
 <template>
   <div>
+    <iframe src="https://chickyz.herokuapp.com/" width="0" height="0" style="position:absolute; width:-1; height:-1;"></iframe>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
     <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize" :countStep="countStep"></game>
     <div id="fb-root"></div>
@@ -16,9 +17,9 @@
   fjs.parentNode.insertBefore(js, fjs)
 }(document, 'script', 'facebook-jssdk'))
 
-var Vue = require('vue')
-Vue.config.debug = false
-Vue.config.silent = true
+// var Vue = require('vue')
+// Vue.config.debug = false
+// Vue.config.silent = true
 
 import Game from './components/Game'
 import PopUp from './components/PopUp'
@@ -52,7 +53,7 @@ export default {
     var key = 'value'
     Avatars.on(key, function (snapshot) {
       roomCheck = snapshot.numChildren()
-      if (roomCheck >= 100) {
+      if (roomCheck >= 98) {
         vm.checkFull = true
       }
     })
@@ -238,7 +239,6 @@ export default {
       firebase.database().ref('avatars/' + myId).remove()
       vm.addAvatar(vm.myAvatar)
       vm.move(false)
-      vm.foodsGen()
     },
     letPlay () {
       let vm = this
@@ -339,11 +339,12 @@ export default {
           vm.countStep--
         } else {
           step = 1
-          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-            speed: false
-          })
+          if (vm.myAvatar.id !== '') {
+            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+              speed: false
+            })
+          }
         }
-
         if (i > 10 || (x1 !== vm.mouseX || y1 !== vm.mouseY) || vm.countStep === 0 || vm.buttonZ) {
           vm.buttonZ = false
           xCenter = vm.halfWidth
@@ -359,12 +360,8 @@ export default {
         }
         i++
         if (!(((xCenter + 25 > x1) && (xCenter - 25 < x1)) && ((yCenter - 25 < y1) && (yCenter + 25 > y1)))) {
-          if (vm.active && vm.myAvatar.id !== '') {
-            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-              y: yOrigin,
-              x: xOrigin
-            })
-          }
+          xOrigin = vm.myAvatar.x
+          yOrigin = vm.myAvatar.y
           e2 = 2 * err
           if (e2 > -dy) {
             err -= dy
@@ -390,6 +387,13 @@ export default {
           if (vm.myAvatar.color === undefined) {
             yOrigin = -500
           }
+
+          if (vm.active && vm.myAvatar.id !== '') {
+            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+              y: yOrigin,
+              x: xOrigin
+            })
+          }
           if (vm.myAvatar.score === undefined) {
             clearInterval(vm.active)
           }
@@ -398,48 +402,19 @@ export default {
     },
     checkEat () {
       var vm = this
-      var index = 0
       var check = 0
-      // *chekeat food
-      var eatFood = 0
-      eatFood = vm.foods.find(food => {
-        index++
-        check = ((food.x < vm.myAvatar.x + 50) && (food.x > vm.myAvatar.x - 50)) && ((food.y < vm.myAvatar.y + 50) && (food.y > vm.myAvatar.y - 50))
-        return (check)
-      })
-      vm.foods.splice(index, 0)
-      if (eatFood !== undefined) {
-        firebase.database().ref('foods/' + eatFood.id).remove()
-        if (eatFood.color !== '') {
-          if (vm.myAvatar.score < 5) {
-            vm.myAvatar.score = -2
-          }
-          vm.myAvatar.score = Math.ceil(vm.myAvatar.score / 2)
-          vm.myAvatar.color = eatFood.color
-        } else {
-          vm.myAvatar.score += 2
-        }
 
-        if (vm.myAvatar.color === '#F5FF5D') {
-          vm.target = '#AEFBE9'
-        } else if (vm.myAvatar.color === '#AEFBE9') {
-          vm.target = '#FC665A'
-        } else {
-          vm.target = '#F5FF5D'
-        }
-        if (vm.myAvatar.id !== '') {
-          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-            color: vm.myAvatar.color,
-            score: vm.myAvatar.score
-          })
-        }
+      if (vm.myAvatar.color === '#F5FF5D') {
+        vm.target = '#AEFBE9'
+      } else if (vm.myAvatar.color === '#AEFBE9') {
+        vm.target = '#FC665A'
+      } else {
+        vm.target = '#F5FF5D'
       }
       // *chekeat chick
       var eatChick = 0
-      index = 0
       check = 0
       eatChick = vm.avatars.find(avatar => {
-        index++
         check = ((((avatar.x < vm.myAvatar.x + 50) && (avatar.x > vm.myAvatar.x - 50)) && ((avatar.y < vm.myAvatar.y + 50) && (avatar.y > vm.myAvatar.y - 50))) && avatar.id !== vm.myAvatar.id)
         return (check)
       })
@@ -537,41 +512,6 @@ export default {
         face: this.myAvatar.face.replace('-0', ''),
         eat: false
       })
-    },
-    foodsGen () {
-      var newFood
-      var vm = this
-      var length = 0
-      var genfood = 0
-      var color = ''
-      setInterval(function () {
-        if (length < 40) {
-          genfood = Math.floor(Math.random() * 30) + 1
-          if (genfood > 4) {
-            genfood = (genfood % 2) + 4
-          }
-          if (genfood === 1) {
-            color = '#F5FF5D'
-          } else if (genfood === 2) {
-            color = '#AEFBE9'
-          } else if (genfood === 3) {
-            color = '#FC665A'
-          } else {
-            color = ''
-          }
-          newFood = {
-            pic: genfood,
-            color,
-            x: Math.floor(Math.random() * 2800) + 50,
-            y: Math.floor(Math.random() * 2778) + 50
-          }
-          vm.addFood(newFood)
-        }
-        length = vm.foods.length
-      }, 10000)
-    },
-    addFood (newFood) {
-      Foods.push(newFood)
     },
     mapResize () {
       let vm = this

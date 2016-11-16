@@ -4,7 +4,7 @@
           Stamina :
         </h5>
         <h5 class="score" style="left:360px; bottom: 0%;">
-          <progress v-model="countStep" max="100"></progress>
+          <progress :value="countStep" max="100"></progress>
           {{countStep}}
         </h5>
   </div>
