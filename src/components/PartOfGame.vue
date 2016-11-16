@@ -16,7 +16,7 @@
 
       <rank-board :ranking="ranking"></rank-board>
 
-      <stamina :countStep="countStep"></stamina>
+      <stamina :countStep="countStep" :maxStep="maxStep"></stamina>
 
       <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
     </div>
@@ -33,7 +33,7 @@ import HallOfFames from './HallOfFames'
 import Stamina from './Stamina'
 
 export default {
-  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize', 'countStep'],
+  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize', 'countStep', 'maxStep'],
   components: {
     Avatar,
     RankBoard,

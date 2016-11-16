@@ -2,7 +2,7 @@
   <div>
     <iframe src="https://chickyz.herokuapp.com/" width="0" height="0" style="position:absolute; width:-1; height:-1;"></iframe>
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize" :countStep="countStep"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize" :countStep="countStep" :maxStep="maxStep"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -158,6 +158,7 @@ export default {
     return {
       buttonZ: false,
       countStep: 100,
+      maxStep: 100,
       mapSize: 0.03,
       ranking: [],
       target: '',
@@ -462,6 +463,7 @@ export default {
         clearInterval(vm.active)
         firebase.database().ref('avatars/' + myId).remove()
       }
+      vm.maxStep = vm.myAvatar.score + 100
     },
     mousePosition () {
       let vm = this

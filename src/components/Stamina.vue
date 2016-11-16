@@ -4,7 +4,7 @@
           Stamina :
         </h5>
         <h5 class="score" style="left:360px; bottom: 0%;">
-          <progress :value="countStep" max="100"></progress>
+          <progress :value="countStep" :max="maxStep"></progress>
           {{countStep}}
         </h5>
   </div>
@@ -12,6 +12,6 @@
 
 <script>
 export default {
-  props: ['countStep']
+  props: ['countStep', 'maxStep']
 }
 </script>
