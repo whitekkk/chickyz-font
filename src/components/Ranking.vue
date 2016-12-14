@@ -17,8 +17,6 @@
 
 <script>
 export default {
-  props: ['rank'],
-  components: {
-  }
+  props: ['rank']
 }
 </script>

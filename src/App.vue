@@ -1,8 +1,9 @@
 <template>
   <div>
-    <iframe src="https://chickyz.herokuapp.com/" width="0" height="0" style="position:absolute; width:-1; height:-1;"></iframe>
+    <!-- <iframe src="https://chichkyz.herokuapp.com/" width="0" height="0" style="position:absolute; width:-1; height:-1;"></iframe> -->
     <pop-up :wait="wait" :checkFull="checkFull" :checkName="checkName" :letPlay="letPlay" :color="color" :myAvatar="myAvatar" :f="f" :c="c" :selectFace="selectFace" :selectColor="selectColor" :waitingTime="waitingTime"></pop-up>
-    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize" :countStep="countStep" :maxStep="maxStep"></game>
+    <game :wait="wait" :mousePosition="mousePosition" :avatars="avatars" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth" :target="target" :foods="foods" :hOFs="hOFs" :ranking="ranking" :mapSize="mapSize" :mapResize="mapResize"
+    :countStep="countStep" :maxStep="maxStep" :scoreColor="scoreColor"></game>
     <div id="fb-root"></div>
   </div>
 </template>
@@ -16,14 +17,13 @@
   js.src = '//connect.facebook.net/th_TH/sdk.js#xfbml=1&version=v2.8'
   fjs.parentNode.insertBefore(js, fjs)
 }(document, 'script', 'facebook-jssdk'))
-
-// var Vue = require('vue')
-// Vue.config.debug = false
-// Vue.config.silent = true
-
 import Game from './components/Game'
 import PopUp from './components/PopUp'
 import firebase from 'firebase'
+import Vue from 'vue'
+import VueSocketio from 'vue-socket.io'
+Vue.use(VueSocketio, 'https://chichkyz.herokuapp.com/') // Automaticly socket connect from url string
+
 var config = {
   apiKey: 'AIzaSyCPjSZnxBY9KLykYc18iW4yNVTbQyaBPsU',
   authDomain: 'chickyz-afcfe.firebaseapp.com',
@@ -33,13 +33,11 @@ var config = {
 }
 firebase.initializeApp(config)
 
-var Avatars = firebase.database().ref('avatars')
 var myId = ''
 window.onbeforeunload = function () {
-  firebase.database().ref('avatars/' + myId).remove()
+  Vue.$socket.emit('remove', myId)
 }
 
-var Foods = firebase.database().ref('foods')
 var HOFs = firebase.database().ref('hofs')
 
 export default {
@@ -49,85 +47,14 @@ export default {
   },
   mounted () {
     let vm = this
-    var roomCheck = 0
-    var key = 'value'
-    Avatars.on(key, function (snapshot) {
-      roomCheck = snapshot.numChildren()
-      if (roomCheck >= 98) {
-        vm.checkFull = true
-      }
-    })
-    key = 'child_moved'
-    let x = Math.floor(Math.random() * 2750) + 50
-    let y = Math.floor(Math.random() * 2788) + 50
-    let avatar = {
-      x,
-      y
-    }
-    let result = Avatars.push(avatar)
-    myId = result.key
-    firebase.database().ref('avatars/' + myId).remove()
-    // *warning
-    Avatars.on('child_added', function (snapshot) {
-      var item = snapshot.val()
-      item.id = snapshot.key
-      vm.avatars.push(item)
-    })
-    Avatars.on('child_changed', function (snapshot) {
-      var id = snapshot.key
-      var avatar = vm.avatars.find(avatar => avatar.id === id)
-      avatar.x = snapshot.val().x
-      avatar.y = snapshot.val().y
-      avatar.color = snapshot.val().color
-      avatar.face = snapshot.val().face
-      avatar.speed = snapshot.val().speed
-      avatar.eat = snapshot.val().eat
-      avatar.score = snapshot.val().score
-      // change
-      if (vm.myAvatar.id === id) {
-        vm.myAvatar.x = snapshot.val().x
-        vm.myAvatar.y = snapshot.val().y
-        vm.myAvatar.color = snapshot.val().color
-        vm.myAvatar.face = snapshot.val().face
-        vm.myAvatar.speed = snapshot.val().speed
-        vm.myAvatar.eat = snapshot.val().eat
-        vm.myAvatar.score = snapshot.val().score
-        if (vm.myAvatar.score === undefined || vm.myAvatar.score < 0) {
-          vm.myAvatar.id = ''
-          vm.wait = true
-          vm.waitingTime = 3
-          vm.checkName = true
-        }
-      }
-    })
-    Avatars.on('child_removed', function (snapshot) {
-      var id = snapshot.key
-      vm.avatars.splice(vm.avatars.findIndex(avatar => avatar.id === id), 1)
-      // vm.checkName = true ***`แก้ซะ`
-    })
-    Foods.on('child_added', function (snapshot) {
-      var item = snapshot.val()
-      item.id = snapshot.key
-      vm.foods.push(item)
-    })
-    Foods.on('child_changed', function (snapshot) {
-      var id = snapshot.key
-      var food = vm.foods.find(food => food.id === id)
-      food.color = snapshot.val().color
-      food.pic = snapshot.val().pic
-      food.x = snapshot.val().x
-      food.y = snapshot.val().y
-      // change
-    })
-    Foods.on('child_removed', function (snapshot) {
-      var id = snapshot.key
-      vm.foods.splice(vm.foods.findIndex(food => food.id === id), 1)
-    })
+    this.$socket.emit('get', '')
+    this.$socket.emit('getFoods', '')
 
     HOFs.on('child_added', function (snapshot) {
       var item = snapshot.val()
       item.id = snapshot.key
       vm.hOFs.push(item)
+      vm.hOFs.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
     })
     HOFs.on('child_changed', function (snapshot) {
       var id = snapshot.key
@@ -139,7 +66,73 @@ export default {
       var id = snapshot.key
       vm.hOFs.splice(vm.hOFs.findIndex(hof => hof.id === id), 1)
     })
-    vm.hOFs.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
+  },
+  sockets: {
+    connect () {
+      console.log('socket connected')
+    },
+    get (val) {
+      this.avatars = val
+      var roomCheck = val.length
+      if (roomCheck >= 98) {
+        this.checkFull = true
+      }
+    },
+    new (val) {
+      if (myId === '' && this.wait !== true) {
+        myId = val.id
+        this.myAvatar.id = val.id
+      }
+      this.avatars.push(val)
+    },
+    remove (val) {
+      var vm = this
+      if (val !== '') {
+        vm.avatars.splice(vm.avatars.findIndex(avatar => avatar.id === val), 1)
+        if (val === myId) {
+          vm.wait = true
+          vm.waitingTime = 3
+          vm.checkName = true
+          myId = ''
+        }
+      }
+    },
+    update (val) {
+      var vm = this
+      var index = vm.avatars.findIndex(avatar => avatar.id === val.id)
+      if (index !== -1) {
+        if (vm.avatars[index].id === myId) {
+          if (val.score) {
+            if (val.score < vm.myAvatar.score) {
+              vm.scoreColor = '#D49999'
+            } else {
+              vm.scoreColor = '#FFFFFF'
+            }
+          }
+        }
+        for (var j in val) {
+          if (j !== 'id') {
+            vm.avatars[index][j] = val[j]
+            if (myId === val.id) {
+              vm.myAvatar[j] = val[j]
+            }
+          }
+        }
+        if (val.score) {
+          vm.checkHOF()
+        }
+      }
+    },
+    getFoods (val) {
+      this.foods = val
+    },
+    updateFoods (val) {
+      this.foods.push(val)
+    },
+    removeFoods (val) {
+      var vm = this
+      vm.foods.splice(vm.foods.findIndex(food => food.id === val), 1)
+    }
   },
   data () {
     let winHeight = window.innerHeight
@@ -154,6 +147,8 @@ export default {
     } else {
       color = '#FC665A'
     }
+    let x = Math.floor(Math.random() * 1050) + 50
+    let y = Math.floor(Math.random() * 1088) + 50
 
     return {
       buttonZ: false,
@@ -178,10 +173,11 @@ export default {
       face: '',
       f,
       c,
+      scoreColor: '#FFFFFF',
       myAvatar: {
         name: '',
-        x: 0,
-        y: 0,
+        x,
+        y,
         face: '',
         color,
         speed: false,
@@ -223,21 +219,10 @@ export default {
     },
     gameStart () {
       let vm = this
-      let count = 0
       setInterval(function () {
         vm.halfHeight = window.innerHeight / 2
         vm.halfWidth = window.innerWidth / 2
-        count++
-        if (count === 3) {
-          vm.ranking = vm.avatars
-          vm.ranking.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
-          vm.ranking = vm.ranking.slice(0, 5)
-          vm.hOFs.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
-          count = 0
-        }
       }, 300)
-      // *** ranks
-      firebase.database().ref('avatars/' + myId).remove()
       vm.addAvatar(vm.myAvatar)
       vm.move(false)
     },
@@ -267,9 +252,6 @@ export default {
         if (e.keyCode === 77) {
           this.mapResize()
         }
-        if (e.keyCode === 90) {
-          this.speed()
-        }
         if (e.keyCode === 88) {
           this.shutup()
         }
@@ -279,11 +261,19 @@ export default {
           this.letPlay()
         }
       }
+      if (e.keyCode === 90) {
+        this.speed()
+      }
     },
     downKey (e) {
       if (this.waitingTime === 0) {
         if (e.keyCode === 88) {
           this.eat()
+        }
+        if (e.keyCode === 90) {
+          if (!this.myAvatar.speed) {
+            this.speed()
+          }
         }
       }
     },
@@ -299,9 +289,10 @@ export default {
       vm.myAvatar.eat = false
       vm.myAvatar.score = 0
       vm.myAvatar.name = vm.myAvatar.name.substring(0, 7)
-      let result = Avatars.push(newAvatar)
-      this.myAvatar.id = result.key
-      myId = this.myAvatar.id
+      // let result = Avatars.push(newAvatar)
+      this.$socket.emit('new', newAvatar)
+      // this.myAvatar.id = result.key
+      // myId = this.myAvatar.id
       if (vm.myAvatar.color === '#F5FF5D') {
         vm.target = '#AEFBE9'
       } else if (vm.myAvatar.color === '#AEFBE9') {
@@ -312,6 +303,7 @@ export default {
     },
     move () {
       let vm = this
+      var update = {}
       let xCenter = vm.halfWidth
       let yCenter = vm.halfHeight
       var xOrigin = vm.myAvatar.x
@@ -340,11 +332,13 @@ export default {
           vm.countStep--
         } else {
           step = 1
-          if (vm.myAvatar.id !== '') {
-            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-              speed: false
-            })
-          }
+          // if (vm.myAvatar.id !== '') {
+          //   update = {
+          //     id: myId,
+          //     speed: false
+          //   }
+          //   vm.$socket.emit('update', update)
+          // }
         }
         if (i > 10 || (x1 !== vm.mouseX || y1 !== vm.mouseY) || vm.countStep === 0 || vm.buttonZ) {
           vm.buttonZ = false
@@ -390,10 +384,13 @@ export default {
           }
 
           if (vm.active && vm.myAvatar.id !== '') {
-            firebase.database().ref('avatars/' + vm.myAvatar.id).update({
+            update = {
+              id: myId,
               y: yOrigin,
               x: xOrigin
-            })
+            }
+            vm.$socket.emit('update', update)
+            // console.log(update)
           }
           if (vm.myAvatar.score === undefined) {
             clearInterval(vm.active)
@@ -404,7 +401,6 @@ export default {
     checkEat () {
       var vm = this
       var check = 0
-
       if (vm.myAvatar.color === '#F5FF5D') {
         vm.target = '#AEFBE9'
       } else if (vm.myAvatar.color === '#AEFBE9') {
@@ -416,52 +412,37 @@ export default {
       var eatChick = 0
       check = 0
       eatChick = vm.avatars.find(avatar => {
-        check = ((((avatar.x < vm.myAvatar.x + 50) && (avatar.x > vm.myAvatar.x - 50)) && ((avatar.y < vm.myAvatar.y + 50) && (avatar.y > vm.myAvatar.y - 50))) && avatar.id !== vm.myAvatar.id)
+        check = ((((avatar.x < vm.myAvatar.x + 50) &&
+        (avatar.x > vm.myAvatar.x - 50)) &&
+        ((avatar.y < vm.myAvatar.y + 50) &&
+        (avatar.y > vm.myAvatar.y - 50))) &&
+        avatar.id !== myId)
         return (check)
       })
-      if (eatChick !== undefined) {
+      if (eatChick) {
         if (vm.myAvatar.color === '#F5FF5D') {
           if (eatChick.color === '#AEFBE9') {
-            firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += Math.ceil((eatChick.score / 2)) + 10
-            if (vm.myAvatar.id !== '') {
-              firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-                score: vm.myAvatar.score
-              })
-            }
+            vm.changeScore(eatChick)
           }
         } else if (vm.myAvatar.color === '#AEFBE9') {
           if (eatChick.color === '#FC665A') {
-            firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += Math.ceil((eatChick.score / 2)) + 10
-            if (vm.myAvatar.id !== '') {
-              firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-                score: vm.myAvatar.score
-              })
-            }
+            vm.changeScore(eatChick)
           }
         } else if (vm.myAvatar.color === '#FC665A') {
           if (eatChick.color === '#F5FF5D') {
-            firebase.database().ref('avatars/' + eatChick.id).remove()
-            vm.myAvatar.score += Math.ceil((eatChick.score / 2) + 10)
-            if (vm.myAvatar.id !== '') {
-              firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-                score: vm.myAvatar.score
-              })
-            }
+            vm.changeScore(eatChick)
           }
         }
         if (Object.keys(eatChick).length === 3 || eatChick.score === undefined) {
-          firebase.database().ref('avatars/' + eatChick.id).remove()
+          vm.$socket.emit('remove', eatChick.id)
           vm.myAvatar.score += 5
-          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-            score: vm.myAvatar.score
-          })
+          vm.updateScore()
         }
       }
       if (vm.myAvatar.score < 0) {
         clearInterval(vm.active)
-        firebase.database().ref('avatars/' + myId).remove()
+        vm.$socket.emit('remove', myId)
+        // firebase.database().ref('avatars/' + myId).remove()
       }
       vm.maxStep = vm.myAvatar.score + 100
     },
@@ -471,49 +452,48 @@ export default {
         let position = window.event
         vm.mouseX = position.clientX
         vm.mouseY = position.clientY
-        let face = vm.myAvatar.color.toString()
-        vm.actionChick(vm, face)
-      }
-    },
-    actionChick (vm, face) {
-      if (this.wait !== true) {
-        if (vm.myAvatar.eat && vm.myAvatar.face !== vm.f + '-0') {
-          firebase.database().ref('avatars/' + vm.myAvatar.id).update({
-            face: vm.myAvatar.face + '-0'
-          })
-        }
       }
     },
     speed () {
       this.buttonZ = true
       this.move()
+      var update = {}
       if (!this.myAvatar.speed) {
         // clearInterval(this.active)
-        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+        update = {
+          id: myId,
           speed: true
-        })
+        }
+        this.$socket.emit('update', update)
       } else {
-        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+        update = {
+          id: myId,
           speed: false
-        })
+        }
+        this.$socket.emit('update', update)
       }
     },
     eat () {
       this.myAvatar.face = this.myAvatar.face.toString()
       if (this.myAvatar.face.search('-0') === -1 && !this.myAvatar.eat) {
-        firebase.database().ref('avatars/' + this.myAvatar.id).update({
+        var update = {
+          id: myId,
           eat: true,
           face: this.myAvatar.face + '-0'
-        })
+        }
+        this.$socket.emit('update', update)
       }
       this.checkEat()
-      this.checkHOF()
     },
     shutup () {
-      firebase.database().ref('avatars/' + this.myAvatar.id).update({
-        face: this.myAvatar.face.replace('-0', ''),
-        eat: false
-      })
+      if (this.waitingTime === 0) {
+        var update = {
+          id: myId,
+          eat: false,
+          face: this.myAvatar.face.replace('-0', '')
+        }
+        this.$socket.emit('update', update)
+      }
     },
     mapResize () {
       let vm = this
@@ -538,6 +518,30 @@ export default {
           name: vm.myAvatar.name,
           score: vm.myAvatar.score
         })
+      }
+      // vm.hOFs.sort((parameterOne, parameterTwo) => parameterTwo.score - parameterOne.score)
+    },
+    updateScore () {
+      if (myId !== '') {
+        var update = {
+          id: myId,
+          score: this.myAvatar.score
+        }
+        this.$socket.emit('update', update)
+      }
+    },
+    changeScore (eatChick) {
+      var vm = this
+      if (eatChick.score !== 0) {
+        var data = {
+          id: eatChick.id,
+          score: eatChick.score - 1
+        }
+        this.$socket.emit('update', data)
+        vm.myAvatar.score++
+        vm.updateScore()
+      } else {
+        vm.$socket.emit('remove', eatChick.id)
       }
     }
   }

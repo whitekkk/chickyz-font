@@ -100,11 +100,17 @@ input[type=text], select {
   border-radius: 4px;
   box-sizing: border-box;
 }
-h5.score {
+h5.status {
   position: absolute;
   color: #FFFFFF;
   text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
   left:20px;
+  bottom: 0;
+}
+h4.score {
+  position: absolute;
+  text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+  left:75px;
   bottom: 0;
 }
 a.ranking {
@@ -128,7 +134,9 @@ div.rankingBoard {
   height: 140px;
   width: 90px;
   position: absolute;
-  background-color:#AAAAAA;
+  background-color:transparent;
+  border: 2px solid #73AD21;
+  /*#977797*/
   opacity:0.4;filter:alpha(opacity=40);
   overflow:hidden;
   border-radius: 8px;
@@ -140,7 +148,9 @@ div.hOF {
   height: 90px;
   width: 200px;
   position: absolute;
-  background-color:#AAAAAA;
+  background-color:transparent;
+  border: 2px solid #73AD21;
+  /*#977797*/
   opacity:0.4;filter:alpha(opacity=40);
   overflow:hidden;
   border-radius: 8px;
@@ -192,6 +202,10 @@ div.law {
   margin-top: -100px;
   margin-left: -200px;
 }
+div.see {
+  /*background-color : transparent;
+  background-color: rgba(255, 0, 0, 0.5)*/
+}
 a.name {
   font-weight: bolder;
   color: #FFFFFF;
@@ -201,7 +215,7 @@ a.name {
 a.explanLaw {
   color: white;
   font-size:1.5em;
-  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black;
 }
 a {
     color: #000000;

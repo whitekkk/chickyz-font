@@ -7,18 +7,23 @@
       </div>
 
       <div class="avatar" :style="{'top': avatar.y-myAvatar.y+(halfHeight)-75 + 'px', 'left': avatar.x-myAvatar.x+halfWidth-50 + 'px'}" v-for="avatar in avatars">
-        <avatar :avatar="avatar" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth"></avatars>
+        <avatar :wait="wait" :avatar="avatar" :myAvatar="myAvatar" :halfHeight="halfHeight" :halfWidth="halfWidth"></avatars>
       </div>
 
-      <mini-map :avatars='avatars' :myAvatar="myAvatar" :foods="foods" :mapSize="mapSize" :mapResize="mapResize"> </mini-map>
+      <div v-show="!wait">
+
+        <rank-board :ranking="ranking"></rank-board>
+
+        <mini-map :avatars='avatars' :myAvatar="myAvatar" :foods="foods" :mapSize="mapSize" :mapResize="mapResize"> </mini-map>
+
+        <stamina :countStep="countStep" :maxStep="maxStep"></stamina>
+
+        <score-and-target :target="target" :myAvatar="myAvatar" :scoreColor="scoreColor"></score-and-targe>
+
+      </div>
 
       <hall-of-fames :hOFs="hOFs"></hall-of-fames>
 
-      <rank-board :ranking="ranking"></rank-board>
-
-      <stamina :countStep="countStep" :maxStep="maxStep"></stamina>
-
-      <score-and-target :target="target" :myAvatar="myAvatar"></score-and-targe>
     </div>
   </div>
 </template>
@@ -33,7 +38,7 @@ import HallOfFames from './HallOfFames'
 import Stamina from './Stamina'
 
 export default {
-  props: ['mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize', 'countStep', 'maxStep'],
+  props: ['wait', 'mousePosition', 'avatars', 'myAvatar', 'halfHeight', 'halfWidth', 'target', 'foods', 'hOFs', 'ranking', 'mapSize', 'mapResize', 'countStep', 'maxStep', 'scoreColor'],
   components: {
     Avatar,
     RankBoard,

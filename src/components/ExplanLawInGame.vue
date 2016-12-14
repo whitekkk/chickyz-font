@@ -1,7 +1,7 @@
 <template>
   <div>
     <center>
-    <a class="explanLaw">
+    <a class="explanLaw" style="z-index: 9999;">
           Please Read <br>
           Z = run <br>
           X = eat <br>
